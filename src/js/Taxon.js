@@ -189,7 +189,7 @@ define([
          *
          * @returns {Number}
          */
-        function getTaxonomicId() {
+        function get_taxonomic_id() {
             return Promise.resolve(client().get_taxonomic_id(authToken, objectReference, true));
         }
 
@@ -197,7 +197,7 @@ define([
          *
          * @returns {String}
          */
-        function getKingdom() {
+        function get_kingdom() {
             return Promise.resolve(client().get_kingdom(authToken, objectReference, true));
         }
 
@@ -205,7 +205,7 @@ define([
          *
          * @returns {String}
          */
-        function getDomain() {
+        function get_domain() {
             return Promise.resolve(client().get_domain(authToken, objectReference, true));
         }
 
@@ -215,7 +215,7 @@ define([
          * @returns {Number}
          * @see {@link http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi} NCBI "The Genetic Codes"
          */
-        function getGeneticCode() {
+        function get_genetic_code() {
             return Promise.resolve(client().get_genetic_code(authToken, objectReference, true));
         }
 
@@ -223,7 +223,7 @@ define([
          *
          * @returns {Array<String>}
          */
-        function getAliases() {
+        function get_aliases() {
             return Promise.resolve(client().get_aliases(authToken, objectReference, true));
         }
 
@@ -234,11 +234,11 @@ define([
             get_genome_annotations: get_genome_annotations,
             get_scientific_lineage: get_scientific_lineage,
             get_scientific_name: get_scientific_name,
-            getTaxonomicId: getTaxonomicId,
-            getKingdom: getKingdom,
-            getDomain: getDomain,
-            getGeneticCode: getGeneticCode,
-            getAliases: getAliases
+            get_taxonomic_id: get_taxonomic_id,
+            get_kingdom: get_kingdom,
+            get_domain: get_domain,
+            get_genetic_code: get_genetic_code,
+            get_aliases: get_aliases
         });
 
     };
