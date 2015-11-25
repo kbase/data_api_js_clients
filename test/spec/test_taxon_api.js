@@ -39,6 +39,47 @@ define([
             var taxon = Taxon({ ref: taxon_ref, url: url, token: '', timeout:
              6000})
         
+        // Note: These are in the same order as methods in Taxon.js
+
+        it('get_parent', function(done) {
+            taxon.get_parent()
+                .then(function(value) {
+                    expect(value).toBe(taxon_data.parent_taxon_ref)
+                    done(); return null
+                }) 
+                .catch(function(err) {
+                    console.error(err)
+                    done.fail('Error fetching parent taxon ref')
+                    return null
+                })
+        }, 10000)
+
+        it('get_children, with no children', function(done) {
+            taxon.get_children()
+                .then(function(value) {
+                    expect(value).toEqual([])
+                    done(); return null
+                }) 
+                .catch(function(err) {
+                    console.error(err)
+                    done.fail('Error fetching children taxon refs')
+                    return null
+                })
+        }, 10000)
+
+        it('get_genome_annotations, with none found', function(done) {
+            taxon.get_genome_annotations()
+                .then(function(value) {
+                    expect(value).toEqual([])
+                    done(); return null
+                }) 
+                .catch(function(err) {
+                    console.error(err)
+                    done.fail('Error fetching children taxon refs')
+                    return null
+                })
+        }, 10000)
+
         it('get_scientific_lineage', function (done) {
             taxon.get_scientific_lineage()
                 .then(function(lineage) {
@@ -70,59 +111,75 @@ define([
                 })
          }, 10000)
 
-        it('get_parent', function(done) {
-            taxon.get_parent()
-                .then(function(value) {
-                    expect(value).toBe(taxon_data.parent_taxon_ref)
-                    done(); return null
-                }) 
-                .catch(function(err) {
+        it('get_taxonomic_id', function (done) {
+            taxon.get_taxonomic_id()
+                .then(function(name) {
+                    expect(name).toBe(taxon_data.taxonomy_id)
+                    done()
+                    return null // not returning promise
+                 })
+                .catch(function (err) {
                     console.error(err)
-                    done.fail('Error fetching parent taxon ref')
-                    return null
+                    done.fail('Error fetching taxonomic ID')
+                    return null // not returning promise
                 })
-        }, 10000)
+         }, 10000)
 
-        it('get_children, with no children', function(done) {
-            taxon.get_children()
-                .then(function(value) {
-                    expect(value).toEqual([])
-                    done(); return null
-                }) 
-                .catch(function(err) {
+        it('get_kingdom', function (done) {
+            taxon.get_kingdom()
+                .then(function(name) {
+                    expect(name).toBe(taxon_data.kingdom)
+                    done()
+                    return null // not returning promise
+                 })
+                .catch(function (err) {
                     console.error(err)
-                    done.fail('Error fetching children taxon refs')
-                    return null
+                    done.fail('Error fetching kingdom')
+                    return null // not returning promise
                 })
-        }, 10000)
+         }, 10000)
 
-        it('get_genome_annotations', function(done) {
-            taxon.get_genome_annotations()
-                .then(function(value) {
-                    expect(value).toEqual([])
-                    done(); return null
-                }) 
-                .catch(function(err) {
+        it('get_domain', function (done) {
+            taxon.get_domain()
+                .then(function(name) {
+                    expect(name).toBe(taxon_data.domain)
+                    done()
+                    return null // not returning promise
+                 })
+                .catch(function (err) {
                     console.error(err)
-                    done.fail('Error fetching children taxon refs')
-                    return null
+                    done.fail('Error fetching domain')
+                    return null // not returning promise
                 })
-        }, 10000)
+         }, 10000)
 
-        // Template, copy and paste above
-        // it('Gets ', function(done)) {
-        //     taxon.getFoo()
-        //         .then(function(value){
-        //             expect(value).toBe(taxon_data.xxxx)
-        //             done(); return null
-        //         }) 
-        //         .catch(function(err) {
-        //             console.error(err)
-        //             done.fail('Error fetching ')
-        //             return null
-        //         })
-        // }, 10000)
+        it('get_genetic_code', function (done) {
+            taxon.get_genetic_code()
+                .then(function(name) {
+                    expect(name).toBe(taxon_data.genetic_code)
+                    done()
+                    return null // not returning promise
+                 })
+                .catch(function (err) {
+                    console.error(err)
+                    done.fail('Error fetching genetic code')
+                    return null // not returning promise
+                })
+         }, 10000)
 
+        it('get_aliases', function (done) {
+            taxon.get_aliases()
+                .then(function(name) {
+                    expect(name).toEqual(taxon_data.aliases)
+                    done()
+                    return null // not returning promise
+                 })
+                .catch(function (err) {
+                    console.error(err)
+                    done.fail('Error fetching aliases')
+                    return null // not returning promise
+                })
+         }, 10000)
     })
 })
 
