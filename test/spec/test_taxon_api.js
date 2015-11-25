@@ -39,8 +39,8 @@ define([
             var taxon = Taxon({ ref: taxon_ref, url: url, token: '', timeout:
              6000})
         
-        it('Gets the scientific lineage for a known taxon', function (done) {
-            taxon.getScientificLineage()
+        it('get_scientific_lineage', function (done) {
+            taxon.get_scientific_lineage()
                 .then(function(lineage) {
                     //console.log('Got lineage: ' + lineage)
                     for (var i=0; i < taxon_lineage.length; i++) {
@@ -56,8 +56,8 @@ define([
                 })
         }, 10000)
         
-        it('Gets the scientific name for a known taxon', function (done) {
-            taxon.getScientificName()
+        it('get_scientific_name', function (done) {
+            taxon.get_scientific_name()
                 .then(function(name) {
                     expect(name).toBe(taxon_data.scientific_name)
                     done()
@@ -70,9 +70,9 @@ define([
                 })
          }, 10000)
 
-        it('Gets parent taxons', function(done)) {
-            taxon.getParent()
-                .then(function(value){
+        it('get_parent', function(done) {
+            taxon.get_parent()
+                .then(function(value) {
                     expect(value).toBe(taxon_data.parent_taxon_ref)
                     done(); return null
                 }) 
@@ -83,19 +83,45 @@ define([
                 })
         }, 10000)
 
-        // Template, copy and paste above
-        it('Gets ', function(done)) {
-            taxon.getFoo()
-                .then(function(value){
-                    expect(value).toBe(taxon_data.xxxx)
+        it('get_children, with no children', function(done) {
+            taxon.get_children()
+                .then(function(value) {
+                    expect(value).toEqual([])
                     done(); return null
                 }) 
                 .catch(function(err) {
                     console.error(err)
-                    done.fail('Error fetching ')
+                    done.fail('Error fetching children taxon refs')
                     return null
                 })
         }, 10000)
+
+        it('get_genome_annotations', function(done) {
+            taxon.get_genome_annotations()
+                .then(function(value) {
+                    expect(value).toEqual([])
+                    done(); return null
+                }) 
+                .catch(function(err) {
+                    console.error(err)
+                    done.fail('Error fetching children taxon refs')
+                    return null
+                })
+        }, 10000)
+
+        // Template, copy and paste above
+        // it('Gets ', function(done)) {
+        //     taxon.getFoo()
+        //         .then(function(value){
+        //             expect(value).toBe(taxon_data.xxxx)
+        //             done(); return null
+        //         }) 
+        //         .catch(function(err) {
+        //             console.error(err)
+        //             done.fail('Error fetching ')
+        //             return null
+        //         })
+        // }, 10000)
 
     })
 })
