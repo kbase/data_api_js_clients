@@ -38,6 +38,7 @@ define([
         console.log('Contacting Taxon API at: "' + url + '"')
             var taxon = Taxon({ ref: taxon_ref, url: url, token: '', timeout:
              6000})
+        
         it('Gets the scientific lineage for a known taxon', function (done) {
             taxon.getScientificLineage()
                 .then(function(lineage) {
@@ -54,6 +55,7 @@ define([
                     return null // not returning promise
                 })
         }, 10000)
+        
         it('Gets the scientific name for a known taxon', function (done) {
             taxon.getScientificName()
                 .then(function(name) {
@@ -67,6 +69,34 @@ define([
                     return null // not returning promise
                 })
          }, 10000)
+
+        it('Gets parent taxons', function(done)) {
+            taxon.getParent()
+                .then(function(value){
+                    expect(value).toBe(taxon_data.parent_taxon_ref)
+                    done(); return null
+                }) 
+                .catch(function(err) {
+                    console.error(err)
+                    done.fail('Error fetching parent taxon ref')
+                    return null
+                })
+        }, 10000)
+
+        // Template, copy and paste above
+        it('Gets ', function(done)) {
+            taxon.getFoo()
+                .then(function(value){
+                    expect(value).toBe(taxon_data.xxxx)
+                    done(); return null
+                }) 
+                .catch(function(err) {
+                    console.error(err)
+                    done.fail('Error fetching ')
+                    return null
+                })
+        }, 10000)
+
     })
 })
 
