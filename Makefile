@@ -8,7 +8,7 @@ clone:
 	test -d core-develop || git clone -b develop https://github.com/kbase/data_api.git core-develop
 
 build: clone
-	PATH=./node_modules/bower/bin:$${PATH} ./node_modules/grunt-cli/bin/grunt build
+	PATH=./node_modules/.bin:$${PATH} grunt build
 
 test: build runtest
 
@@ -16,7 +16,7 @@ runtest: init karma shutdown report
 
 karma: FORCE
 	@printf "+- Run tests\n"
-	./node_modules/karma-cli/bin/karma start test/karma.conf.js >karma.out 2>&1
+	PATH=./node_modules/.bin:$${PATH} karma start test/karma.conf.js >karma.out 2>&1
 
 init: FORCE
 	@printf "+- Init: Run proxy\n"
