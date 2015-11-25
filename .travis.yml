@@ -15,7 +15,6 @@ before_install:
   - git clone -b develop https://github.com/kbase/data_api.git core-develop
   - ( cd core-develop && git submodule init && git submodule update )
   - npm install -g bower
-  - npm install codecov.io --save
 
 install:
   - cd core-develop
@@ -55,6 +54,6 @@ after_success:
 #  - kill $(cat genomeannotationAPI.pid)
 # Make service logs easy to inspect, then clean up
   - cat taxonAPI.out
-  #- cat assemblyAPI.out
-  #- cat gaAPI.out
+  - cat assemblyAPI.out
+  - cat gaAPI.out
   - rm -f taxonAPI.out assemblyAPI.out gaAPI.out
