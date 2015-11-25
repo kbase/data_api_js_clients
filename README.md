@@ -2,7 +2,7 @@
 
 Last modified: 23 November 2015
 
-[![Build Status](https://travis-ci.org/kbase/data_api_js_clients.svg?branch=develop)](https://travis-ci.org/kbase/data_api_js_clients)
+[![Build Status](https://travis-ci.org/dangunter/data_api_js_clients.svg)](https://travis-ci.org/dangunter/data_api_js_clients)
 
 # JavaScript API Wrappers for the Data API
 
