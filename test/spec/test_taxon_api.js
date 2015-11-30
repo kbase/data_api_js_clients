@@ -36,8 +36,9 @@ define([
     describe('Taxon API', function () {
         var url = base_url + service_suffix.taxon
         console.log('Contacting Taxon API at: "' + url + '"')
-            var taxon = Taxon({ ref: taxon_ref, url: url, token: '', timeout:
-             6000})
+
+        // Standard constructor
+        var taxon = Taxon({ ref: taxon_ref, url: url, token: '', timeout:6000})
         
         // Note: These are in the same order as methods in Taxon.js
 
@@ -180,6 +181,79 @@ define([
                     return null // not returning promise
                 })
          }, 10000)
+
+        // Constructor variants
+
+        it('constructor without config', function (done) {
+             var ctor = function() { Taxon() }
+             expect(ctor).toThrow()
+             done()
+             return null
+         }, 1000)
+
+        it('constructor with empty config', function (done) {
+             var ctor = function() { Taxon({}) }
+             expect(ctor).toThrow()
+             done()
+             return null
+         }, 1000)
+
+        it('constructor config missing ref', function (done) {
+            var ctor = function() { 
+                Taxon({url: url, token: '', timeout:6000}) 
+            }
+            expect(ctor).toThrow()
+            done()
+            return null
+         }, 1000)
+
+        it('constructor config missing url', function (done) {
+            var ctor = function() { 
+                Taxon({ref: taxon_ref, token: '', timeout:6000}) 
+            }
+            expect(ctor).toThrow()
+            done()
+            return null
+         }, 1000)
+
+        it('constructor config null token', function (done) {
+            var ctor = function() { 
+                Taxon({ref: taxon_ref, url: url, token: null, timeout:6000}) 
+            }
+            expect(ctor).not.toThrow()
+            done()
+            return null
+         }, 1000)
+
+        it('constructor config bad token', function (done) {
+            var ctor = function() { 
+                Taxon({ref: taxon_ref, url: url, token: "hello, world", timeout:6000}) 
+            }
+            expect(ctor).toThrow()
+            done()
+            return null
+         }, 1000)
+
+        it('constructor config no timeout', function (done) {
+            var ctor = function() { 
+                Taxon({ref: taxon_ref, url: url, token: ''}) 
+            }
+            expect(ctor).not.toThrow()
+            done()
+            return null
+         }, 1000)
+
+        it('client bad url', function (done) {
+            var runner = function() { 
+                var c = Taxon({ref: taxon_ref, url: 'http://localhost:99', 
+                       token: ''}) 
+                    .client()
+                console.info("Bad URL Client: ", c)
+            }
+            expect(runner).toThrow()
+            done()
+            return null
+         }, 1000)
     })
 })
 

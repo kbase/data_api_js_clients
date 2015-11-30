@@ -1,4 +1,4 @@
-# Run top-level tasks the old-fashioned way
+# Run top-level tasks (build, test) the old-fashioned way
 # This is for easing development, and documentation,
 # and not an official supported build step.
 
