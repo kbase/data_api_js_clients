@@ -1,8 +1,8 @@
 **Version: 0.1.0**
 
-Last modified: 23 November 2015
-
 [![Build Status](https://travis-ci.org/dangunter/data_api_js_clients.svg)](https://travis-ci.org/dangunter/data_api_js_clients)
+[![codecov.io](https://codecov.io/github/dangunter/data_api_js_clients/coverage.svg?branch=master)](https://codecov.io/github/dangunter/data_api_js_clients?branch=master)
+![codecov.io](https://codecov.io/github/dangunter/data_api_js_clients/branch.svg?branch=master)
 
 # JavaScript API Wrappers for the Data API
 
