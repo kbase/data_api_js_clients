@@ -9,6 +9,15 @@ module.exports = function (grunt) {
     // required to actually run the build client and server.
     var runtimeDir = 'runtime';
 
+
+    // Mapping of API names to the directory paths where the generate Thrift files
+    // will be found
+    var api_names = [
+        { path: 'taxonomy/taxon', name: 'taxon' },
+        { path: 'sequence/assembly', name: 'assembly' },
+        { path: 'annotation/genome_annotation', name: 'genome_annotation' }
+    ]
+
     // The build directory is the destination for the KBase source, messaged
     // external dependencies, and other files needed to run the client and server
     // components. The build directory can be used directly in development mode,
@@ -62,7 +71,9 @@ module.exports = function (grunt) {
      * - determine the name of the "subject" and return it as the module object
      * - modest code repair to assist in reducing lint noise (and of course improve code reliability)
      */
-    function fixThrift1(content) {
+
+     // Fix a Thrift-generated JS stub for the "types" (file will end in "_types.js")
+    function fixThriftTypes(content) {
         var namespaceRe = /^if \(typeof ([^\s\+]+)/m,
             namespace = content.match(namespaceRe)[1],
             lintDecls = '/*global define */\n/*jslint white:true */',
@@ -76,7 +87,9 @@ module.exports = function (grunt) {
 
         return [lintDecls, requireJsStart, repairedContent, requireJsEnd].join('\n');
     }
-    function fixThrift2(content) {
+
+    // Fix a Thrift-generated JS stub thrift_service.js
+    function fixThriftService(content) {
         var lintDecls = '/*global define */\n/*jslint white:true */',
             namespaceRe = /^([^\/\s\.]+)/m,
             namespace = content.match(namespaceRe)[1],
@@ -237,7 +250,12 @@ module.exports = function (grunt) {
 
     // Project configuration.
     grunt.initConfig({
+        // This is the path to the root of the Data API core
+        // directory, which contains the Thrift specs and other cool things.
+        corepath: 'core-develop',
+
         pkg: grunt.file.readJSON('package.json'),
+        // Uses grunt-contrib-copy plugin (https://github.com/gruntjs/grunt-contrib-copy)
         copy: {
             bower: {
                 files: bowerCopy
@@ -295,33 +313,35 @@ module.exports = function (grunt) {
                     }
                 ]
             },
-            thriftLib1: {
-                files: [
-                    {
-                        cwd: 'temp/gen-js',
-                        src: 'taxon_types.js',
-                        dest: makeBuildPath('js/thrift/taxon'),
+            thriftTypes: {
+                files: api_names.map(function(value) {
+                    grunt.log.writeln('Fix ' + value.name + '_types.js')
+                    return  {
+                        cwd: 'temp/' + value.name,
+                        src: value.name + '_types.js',
+                        dest: makeBuildPath('js/thrift/' + value.name),
                         expand: true
                     }
-                ],
+                }),
                 options: {
                     process: function (content) {
-                        return fixThrift1(content);
+                        return fixThriftTypes(content);
                     }
                 }
             },
-            thriftLib2: {
-                files: [
-                    {
-                        cwd: 'temp/gen-js',
+            thriftService: {
+                files: api_names.map(function(value) {
+                    grunt.log.writeln('Fix ' + value.name + '/thrift_service.js')
+                    return {
+                        cwd: 'temp/' + value.name,
                         src: 'thrift_service.js',
-                        dest: makeBuildPath('js/thrift/taxon'),
+                        dest: makeBuildPath('js/thrift/' + value.name),
                         expand: true
                     }
-                ],
+                }),
                 options: {
                     process: function (content) {
-                        return fixThrift2(content);
+                        return fixThriftService(content);
                     }
                 }
             },
@@ -371,12 +391,17 @@ module.exports = function (grunt) {
         },
         shell: {
             compileThrift: {
-                command: [
-                    'thrift',
-                    '-gen js:jquery',
-                    '-o temp',
-                    '<%= corepath %>/thrift/specs/taxonomy/taxon/taxon.thrift'
-                ].join(' '),
+                // Loop through api_names array and make commands to generate Thrift JS stubs.
+                // Get input files from "<api_names.path>/<api_names.name>".
+                // Put output in directories under "<temp>/<api_names.name>".
+                command: api_names.map(function(value) {
+                    var target = 'temp/' + value.name
+                    var cmd = 'mkdir -p ' + target + '; thrift -gen js:jquery -out ' + target +
+                              ' <%= corepath %>/thrift/specs/' + value.path  + 
+                              '/' + value.name + '.thrift'
+                    grunt.log.writeln('Compile Thrift command: ' + cmd + '"')
+                    return cmd
+                }).join(';'), // join all the commands into one big command
                 options: {
                     stderr: false
                 }
@@ -447,10 +472,7 @@ module.exports = function (grunt) {
            }
         },
 
-        // This is the path to the root of the Data API core
-        // directory, which contains the Thrift specs and other cool things.
-        corepath: 'core-develop'
-        
+
     });
 
     grunt.registerTask('build', [
@@ -479,8 +501,8 @@ module.exports = function (grunt) {
         'clean:temp',
         'mkdir:temp',
         'shell:compileThrift',
-        'copy:thriftLib1',
-        'copy:thriftLib2'
+        'copy:thriftTypes',
+        'copy:thriftService'
 
             //'copy:thriftLib',
             //'copy:thriftBinaryLib'
@@ -493,4 +515,6 @@ module.exports = function (grunt) {
        'open:dev',
        'connect'
    ]);
+
+   grunt.registerTask('testloop', ['shell:testloop'])
 };
