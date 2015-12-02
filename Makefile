@@ -10,7 +10,12 @@ clone:
 build: clone
 	PATH=./node_modules/.bin:$${PATH} grunt build
 
+rebuild:
+	PATH=./node_modules/.bin:$${PATH} grunt build-thrift-libs
+
 test: build runtest
+
+retest: rebuild runtest
 
 runtest: init karma shutdown report
 
