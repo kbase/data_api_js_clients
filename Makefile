@@ -16,13 +16,16 @@ runtest: init karma shutdown report
 
 karma: FORCE
 	@printf "+- Run tests\n"
-	PATH=./node_modules/.bin:$${PATH} karma start test/karma.conf.js >karma.out 2>&1
+	PATH=./node_modules/.bin:$${PATH} karma start test/karma.conf.js #>karma.out #2>&1
 
 init: FORCE
 	@printf "+- Init: Run proxy\n"
 	CORSPROXY_PORT=8000 ./node_modules/corsproxy/bin/corsproxy > corsproxy.out 2>&1 &
 	@printf "+- Init: Start services\n"
-	data_api_start_service.py --config data_api-test.cfg --kbase_url test --service taxon > taxon_service.out 2>&1 &
+	@for s in taxon assembly ; do \
+		printf "  +-- Start $$s service\n"; \
+		(data_api_start_service.py --config data_api-test.cfg --kbase_url test --service $$s > $$s_service.out 2>&1 &) ;\
+	done
 
 shutdown: FORCE
 	@printf "+- Shutdown\n"

@@ -29,8 +29,15 @@ requirejs.config({
         // by grunt tasks.
         taxon_types: 'js/thrift/taxon/taxon_types',
         taxon_service: 'js/thrift/taxon/thrift_service',
-        // The main product
+        assembly_types: 'js/thrift/assembly/assembly_types',
+        assembly_service: 'js/thrift/assembly/thrift_service',
+        genome_annotation_types: 'js/thrift/genome_annotation/genome_annotation_types',
+        genome_annotation_service: 'js/thrift/genome_annotation/thrift_service',
+        // Data APIs
         kb_data_taxon: 'js/Taxon',
+        kb_data_assembly: 'js/Assembly',
+//        kb_data_genome_annotation: 'js/GenomeAnnotation',
+        // KBase common
         kb_common_html: 'bower_components/kbase-common-js/html',
         kb_common_cookie: 'bower_components/kbase-common-js/cookie',
         kb_common_logger: 'bower_components/kbase-common-js/logger',
