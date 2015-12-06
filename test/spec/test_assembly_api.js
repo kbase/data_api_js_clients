@@ -88,9 +88,9 @@ define([
             'kb|g.166819.c.7': 0.6075557411178291,
             'kb|g.166819.c.8': 0.6148127831283455,
             'kb|g.166819.c.9': 0.6151714921323044
-        }
+        },
     }
-    test_data.contig_ids = Object.keys(test_data.contig_lengths)
+    test_data.contig_id_list = Object.keys(test_data.contig_gc_content)
 
     // Assembly API tests
     describe('Assembly API', function () {
@@ -100,11 +100,19 @@ define([
         // Standard constructor
         var api_obj = Assembly({ ref: test_ref, url: url, token: '', timeout:6000})
 
+        // Utility methods
+        // ===============
+
         // Check a numeric value up to 6 digits of precision
 
         function _check_scalar(v1, v2) {
             if (typeof(v1) == 'number') {
                 expect(v1).toBeCloseTo(v2, 6)
+            }
+            else if (Array.isArray(v1)) {
+                // sort arrays (in-place) before comparing them
+                v1.sort(); v2.sort()
+                expect(v1).toEqual(v2)
             }
             else {
                 expect(v1).toEqual(v2)
@@ -118,11 +126,15 @@ define([
             it(name, function(done) {
                 result
                     .then(function(value) {
-                        if (typeof(test_value) == 'object') {
-                            Object.keys(test_value)
-                                .forEach(function(k) {
-                                    _check_scalar(test_value[k], value[k])
-                                })
+                        if (Array.isArray(test_value)) {
+                            // sort arrays (in-place) before comparing them
+                            test_value.sort(); value.sort()
+                            expect(test_value).toEqual(value)
+                        }
+                        else if (typeof(test_value) == 'object') {
+                            Object.keys(test_value).map(function(k) {
+                                _check_scalar(test_value[k], value[k])
+                            })
                         }
                         else {
                             //console.info('simple scalar check. v1=', test_value, 'v2=', value)
@@ -138,6 +150,9 @@ define([
             }, 10000)
         }
 
+        // Tests
+        // =====
+
         // Run the checks for all zero-argument methods.
         // Each element in the array is a pair of names:
         //   [function-name, test_data-property-name]
@@ -149,40 +164,90 @@ define([
          ['get_number_contigs', 'num_contigs'],
          ['get_gc_content', 'gc_content'],
          ['get_dna_size', 'dna_size'],
-         ['get_contig_ids', 'contig_ids']
         ]
-            .forEach(function(kvp) { 
+            .map(function(kvp) { 
                 var meth = kvp[0], attr = kvp[1]
                 var test_value = test_data[attr]
+                console.info('Test ' + meth)
                 _check(meth, test_value, api_obj[meth]()) 
             })
 
         // Run the checks for methods taking a list of contigs
 
-        var contig_methods = [
-            ['get_contig_lengths', 'contig_lengths'],
-            ['get_contig_gc_content', 'contig_gc_content'],
-            ['get_contigs', 'contig_ids']
-        ]
+        // (1) Empty list
+        // get_contig_lengths
+        it('get_contig_lengths for []', function(done) {
+            function x() { api_obj.get_contig_lengths([]) }
+            expect(x).toThrow()
+            done(); return null
+        }, 10000)
+        // get_contig_gc_content
+        it('get_contig_gc_content for []', function(done) {
+            function x() { api_obj.get_contig_gc_content([]) }
+            expect(x).toThrow()
+            done(); return null
+        }, 10000)
+        // get_contigs
+        it('get_contigs for []', function(done) {
+            function x() { api_obj.get_contigs([]) }
+            expect(x).toThrow()
+            done(); return null
+        }, 10000)
 
-        /// XXX: Get these working, too!!
-        
-        // Run the tests for different lists of contigs
-        // [[],                         // empty list
-        //  [test_data.contig_ids[0]],  // 1 item list
-        //  test_data.contig_ids        // multiple-item list
-        // ].forEach(function(contigs) {
-        //     console.log("@@ contigs length = " + contigs.length)
-        //     // Run each method against the list of contigs
-        //     contig_methods
-        //         .forEach(function(kvp) {
-        //             var meth = kvp[0] + '-' + contigs.length
-        //             var test_value = test_data[kvp[1]]                    
-        //             _check(meth, test_value, api_obj[meth](contigs))
-        //         })
-        // })
+        // (2) List of 1 element
+        // get_contig_lengths
+        var contig1 = test_data.contig_id_list[0]
+        it('get_contig_lengths for 1', function(done) {
+            api_obj.get_contig_lengths([contig1])
+                .then(function(result) {
+                    expect(result[contig1])
+                        .toEqual(test_data.contig_lengths[contig1])
+                })
+            done(); return null
+        }, 10000)
+        // get_contig_gc_content
+        it('get_contig_gc_content for 1', function(done) {
+            api_obj.get_contig_gc_content([contig1])
+                .then(function(result) {
+                    expect(result[contig1])
+                        .toEqual(test_data.contig_gc_content[contig1])
+                })
+            done(); return null
+        }, 10000)
+        // get_contigs
+        it('get_contigs for 1', function(done) {
+            api_obj.get_contigs([contig1])
+                .then(function(result) {
+                    expect(Object.keys(result).length).toEqual(1)
+                })
+            done(); return null
+        }, 10000)
 
-        // Constructor variants
+        // List of all contigs
+        // get_contig_lengths
+        var contigall = test_data.contig_id_list
+        it('get_contig_lengths for all', function(done) {
+            api_obj.get_contig_lengths(contigall)
+                .then(function(result) {
+                    contigall.forEach(function(key) {
+                        expect(result[key]).toEqual(test_data.contig_lengths[key])
+                    })
+                })
+            done(); return null
+        }, 10000)
+        // get_contig_gc_content
+        var contigall = test_data.contig_id_list
+        it('get_contig_gc_content for all', function(done) {
+            api_obj.get_contig_gc_content(contigall)
+                .then(function(result) {
+                    contigall.forEach(function(key) {
+                        expect(result[key]).not.toBe(undefined)
+                    })
+                })
+            done(); return null
+        }, 10000)
+
+        // Check constructor variants
 
         it('constructor without config', function (done) {
              var ctor = function() { Assembly() }

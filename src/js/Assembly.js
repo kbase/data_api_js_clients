@@ -146,6 +146,14 @@ define([
                 // with one argument (a list of contigs), and returns a Promise.
                 var fname = 'get_' + name
                 _exports[fname] = function(contigs) {
+                    if (contigs.length == 0) {
+                        throw {
+                            type: 'ArgumentError',
+                            name: 'EmptyContigList',
+                            message: 'List of contigs for ' + fname + ' cannot be empty',
+                            suggestion: 'You must have at least one contig in the list.'
+                        }
+                    }
                     return Promise.resolve(client()[fname](authToken,
                         objectReference, contigs, true))
                 }
