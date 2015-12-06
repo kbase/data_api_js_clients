@@ -12,6 +12,7 @@ cache:
 
 
 before_install:
+  - export PATH=$PATH:`pwd`/node_modules/.bin
   - git clone -b develop https://github.com/kbase/data_api.git core-develop
   - ( cd core-develop && git submodule init && git submodule update )
   - npm install -g bower
@@ -39,7 +40,8 @@ before_script:
   - redis-server redis.conf &
 
 script:
-  - ./node_modules/.bin/karma start test/karma.conf.js
+  - ls -lR runtime/build/js/  # debugging
+  - karma start test/karma.conf.js
 
 env:
   - KB_DEPLOY_URL="dir_cache"
