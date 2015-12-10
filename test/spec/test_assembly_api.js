@@ -174,20 +174,27 @@ define([
 
         // Run the checks for methods taking a list of contigs
 
+        var  sayit = function(f, m) {
+            console.info('Test get_contig' + f + ' for ' + m)
+        }
+
         // (1) Empty list
         // get_contig_lengths
+        sayit('_lengths', '[]')
         it('get_contig_lengths for []', function(done) {
             function x() { api_obj.get_contig_lengths([]) }
             expect(x).toThrow()
             done(); return null
         }, 10000)
         // get_contig_gc_content
+        sayit('_gc_content', '[]')
         it('get_contig_gc_content for []', function(done) {
             function x() { api_obj.get_contig_gc_content([]) }
             expect(x).toThrow()
             done(); return null
         }, 10000)
         // get_contigs
+        sayit('s', '[]')
         it('get_contigs for []', function(done) {
             function x() { api_obj.get_contigs([]) }
             expect(x).toThrow()
@@ -197,6 +204,7 @@ define([
         // (2) List of 1 element
         // get_contig_lengths
         var contig1 = test_data.contig_id_list[0]
+        sayit('_lengths', '1')
         it('get_contig_lengths for 1', function(done) {
             api_obj.get_contig_lengths([contig1])
                 .then(function(result) {
@@ -206,6 +214,7 @@ define([
             done(); return null
         }, 10000)
         // get_contig_gc_content
+        sayit('_gc_content', '1')
         it('get_contig_gc_content for 1', function(done) {
             api_obj.get_contig_gc_content([contig1])
                 .then(function(result) {
@@ -215,6 +224,7 @@ define([
             done(); return null
         }, 10000)
         // get_contigs
+        sayit('s', '1')
         it('get_contigs for 1', function(done) {
             api_obj.get_contigs([contig1])
                 .then(function(result) {
@@ -225,6 +235,7 @@ define([
 
         // List of all contigs
         // get_contig_lengths
+        sayit('_lengths', 'all')
         var contigall = test_data.contig_id_list
         it('get_contig_lengths for all', function(done) {
             api_obj.get_contig_lengths(contigall)
@@ -236,6 +247,7 @@ define([
             done(); return null
         }, 10000)
         // get_contig_gc_content
+        sayit('_gc_content', 'all')
         var contigall = test_data.contig_id_list
         it('get_contig_gc_content for all', function(done) {
             api_obj.get_contig_gc_content(contigall)
@@ -249,6 +261,11 @@ define([
 
         // Check constructor variants
 
+        sayit = function(m) {
+            console.info('Test Assembly API constructor ' + m)
+        }
+
+        sayit('without config')
         it('constructor without config', function (done) {
              var ctor = function() { Assembly() }
              expect(ctor).toThrow()
@@ -256,6 +273,7 @@ define([
              return null
          }, 1000)
 
+        sayit('with empty config')
         it('constructor with empty config', function (done) {
              var ctor = function() { Assembly({}) }
              expect(ctor).toThrow()
@@ -263,6 +281,7 @@ define([
              return null
          }, 1000)
 
+        sayit('with config missing ref')
         it('constructor config missing ref', function (done) {
             var ctor = function() { 
                 Assembly({url: url, token: '', timeout:6000}) 
@@ -272,6 +291,7 @@ define([
             return null
          }, 1000)
 
+        sayit('config missing url')
         it('constructor config missing url', function (done) {
             var ctor = function() { 
                 Assembly({ref: test_ref, token: '', timeout:6000}) 
@@ -281,6 +301,7 @@ define([
             return null
          }, 1000)
 
+        sayit('config null token')
         it('constructor config null token', function (done) {
             var ctor = function() { 
                 Assembly({ref: test_ref, url: url, token: null, timeout:6000}) 
@@ -290,6 +311,7 @@ define([
             return null
          }, 1000)
 
+        sayit('config bad token')
         it('constructor config bad token', function (done) {
             var ctor = function() { 
                 Assembly({ref: test_ref, url: url, token: "hello, world", timeout:6000}) 

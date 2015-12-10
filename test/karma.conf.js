@@ -28,7 +28,7 @@ module.exports = function(config) {
         'karma-requirejs',
         'karma-chrome-launcher',
         'karma-firefox-launcher',
-        'karma-safari-launcher'
+//        'karma-safari-launcher'
     ],
 
 
@@ -46,7 +46,8 @@ module.exports = function(config) {
       {pattern: 'runtime/build/js/*.js', included: false},
       {pattern: 'runtime/build/js/**/*.js', included: false},
       {pattern: 'runtime/build/bower_components/**/*.js', included: false},
-      {pattern: 'test/spec/**/*.js', included: false},
+      //{pattern: 'test/spec/**/*.js', included: false},
+      {pattern: 'test/spec/*.js', included: false},
       //{pattern: 'runtime/build/config/config.yml', included: false},
 
       'test/main-test.js',

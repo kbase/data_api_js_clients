@@ -37,15 +37,21 @@ retest: rebuild runtest
 
 runtest: init karma shutdown report
 
+runtestc: init karmac shutdown
+
 karma: FORCE
 	@printf "+- Run tests with Karma, output in karma.out\n"
 	PATH=./node_modules/.bin:$${PATH} karma start test/karma.conf.js >karma.out 2>&1
+
+karmac: FORCE
+	@printf "+- Run tests with Karma, output to console\n"
+	PATH=./node_modules/.bin:$${PATH} karma start test/karma.conf.js
 
 init: FORCE
 	@printf "+- Init: Run proxy\n"
 	CORSPROXY_PORT=8000 ./node_modules/corsproxy/bin/corsproxy > corsproxy.out 2>&1 &
 	@printf "+- Init: Start services\n"
-	for s in taxon assembly ; do \
+	for s in taxon assembly genome_annotation ; do \
 		printf "  +-- Start $$s service\n"; \
 		( data_api_start_service.py --config data_api-test.cfg --kbase_url localhost --service $$s > $$s.out 2>&1 & ) ;\
 	done
@@ -54,6 +60,7 @@ shutdown: FORCE
 	@printf "+- Shutdown\n"
 	ps auxw | grep "[d]ata_api_start_service" | cut -c17-23 | xargs kill
 	ps auxw | grep "[c]orsproxy" | cut -c17-23 | xargs kill
+	@ sleep 2
 
 report:
 	@printf "%s\n" '---'

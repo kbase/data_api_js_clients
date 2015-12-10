@@ -10,7 +10,7 @@
 /*jslint white: true, browser: true*/
 define([
     'bluebird',
-    'assembly_service',
+    'genome_annotation_service',
     'thrift',
 
     // These don't have representations. Loading them causes the Thrift module
@@ -47,7 +47,7 @@ define([
                 name: 'ConfigurationObjectMissing',
                 message: 'Configuration object missing',
                 suggestion: 'This is an API usage error; the GenomeAnnotation factory object is required to have a single configuration object as an argument.'
-            };
+            }
         }
         objectReference = config.ref;
         if (!objectReference) {
@@ -56,7 +56,7 @@ define([
                 name: 'ObjectReferenceMissing',
                 message: 'Object reference "ref" missing',
                 suggestion: 'The object reference is provided as in the "ref" argument to the config property'
-            };
+            }
         }
         dataAPIUrl = config.url;
         if (!dataAPIUrl) {
@@ -65,11 +65,10 @@ define([
                 name: 'UrlMissing',
                 message: 'Cannot find a url for the data api',
                 suggestion: 'The url is provided as in the "url" argument property'
-            };
-
+            }
         }
         authToken = config.token;
-        if (authToken == '' || authToken == null) {
+        if (authToken === '' || authToken === null) {
         }
         else if (!authToken.match(/un=.*\|tokenid=.*/)) {
             throw {
@@ -79,7 +78,7 @@ define([
                          'must match pattern "un=<name>|tokenid=<token>..."',
                 suggestion: 'Authorization is provided in the "token"' +
                             'argument property'
-            };
+            }
         }
         timeout = config.timeout;
         if (!timeout) {
@@ -122,13 +121,13 @@ define([
 
         // Zero-argument methods
 
-        var _flist = [
-            'taxon', 'assembly', 'feature_types', 'proteins']
+        var _flist = ['taxon', 'assembly', 'feature_types', 'proteins']
+
         _flist.forEach(function(name) { 
                 // Set exported function to a function curried for 'name'
                 // that calls a function of the same name on the client
                 // with no arguments, and returns a Promise.
-                var fname = 'get_' + name
+                var fname = 'get_' + name;
                 _exports[fname] = function() {
                     return Promise.resolve(client()[fname](authToken,
                         objectReference, true)) 
@@ -141,17 +140,18 @@ define([
                   'features', 'feature_locations', 'feature_publications', 'feature_dna',
                   'feature_functions', 'feature_aliases', 'cds_by_gene', 'cds_by_mrna',
                   'gene_by_cds', 'gene_by_mrna', 'mrna_by_cds', 'mrna_by_gene']
+
         _flist.forEach(function(name) {
                 // Set exported function to a function curried for 'name'
                 // that calls a function of the same name on the client
                 // with one argument (a list of identifiers), and returns a Promise.
                 var fname = 'get_' + name
                 _exports[fname] = function(items) {
-                    if (items.length == 0) {                        
+                    if (items.length === 0) {                        
                         throw {
                             type: 'ArgumentError',
                             name: 'Empty' + (name.search('_type_') > 0 ? 'Type': 'Identifier') + 'List',
-                            message: 'List for ' + fname + ' cannot be empty',
+                            message: 'Input list for ' + fname + ' cannot be empty',
                             suggestion: 'You must have at least one item in the list.'
                         }
                     }
