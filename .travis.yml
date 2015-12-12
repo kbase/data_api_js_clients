@@ -31,7 +31,7 @@ before_script:
   # Run services
   - data_api_start_service.py --service taxon --config deployment.cfg > taxonAPI.out 2>&1 &
   - data_api_start_service.py --service assembly --config deployment.cfg > assemblyAPI.out 2>&1 &
-#  - data_api_start_service.py --service genomeannotation --config deployment.cfg > gaAPI.out 2>&1 &
+  - data_api_start_service.py --service genomeannotation --config deployment.cfg > gaAPI.out 2>&1 &
   - export DISPLAY=:99.0
   - export CHROME_BIN=chromium-browser
   - sh -e /etc/init.d/xvfb start
@@ -53,7 +53,7 @@ after_success:
   - cat coverage/lcov/lcov.info | ./node_modules/.bin/codecov
   - kill $(cat taxonAPI.pid)
   - kill $(cat assemblyAPI.pid)
-#  - kill $(cat genomeannotationAPI.pid)
+  - kill $(cat genomeannotationAPI.pid)
 # Make service logs easy to inspect, then clean up
   - cat taxonAPI.out
   - cat assemblyAPI.out
