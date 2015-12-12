@@ -98,19 +98,21 @@ define([
              try {
                 var transport = new Thrift.TXHRTransport(dataAPIUrl, {timeout: timeout}),
                     protocol = new Thrift.TBinaryProtocol(transport),
-                    thriftClient = new assembly.thrift_serviceClient(protocol);
+                    thriftClient = new genome_annotation.thrift_serviceClient(protocol);
                 return thriftClient;
             } catch (ex) {
                 // Rethrow exceptions in our format:
                 if (ex.type && ex.name) {
                     throw ex;
                 } else {
-                    throw {
+                    var error_obj = {
                         type: 'ThriftError',
                         message: 'An error was encountered creating the thrift client objects',
                         suggestion: 'This could be a configuration or runtime error. Please consult the console for the error object',
-                        errorObject: ex
-                    };
+                        errorObject: ex,
+                        url: dataAPIUrl
+                    }
+                    throw error_obj
                 }
             }
         }
@@ -127,7 +129,7 @@ define([
                 // Set exported function to a function curried for 'name'
                 // that calls a function of the same name on the client
                 // with no arguments, and returns a Promise.
-                var fname = 'get_' + name;
+                var fname = 'get_' + name
                 _exports[fname] = function() {
                     return Promise.resolve(client()[fname](authToken,
                         objectReference, true)) 
@@ -169,6 +171,7 @@ define([
 
         // Return public methods
 
+        //console.info('@@ GA exporting:', _exports)
         return Object.freeze(_exports)
 
     };

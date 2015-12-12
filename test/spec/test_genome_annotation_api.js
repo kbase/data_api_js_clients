@@ -15,8 +15,10 @@ define([
 
 
     // Expected values for GenomeAnnotation
-    var test_ref = '1013/92/2'
-    var test_data = { }
+    var test_ref = '1013/340/4'
+    var test_data = { 
+        taxon: '993/616059/2'
+    }
 
     // GenomeAnnotation API tests
     describe('GenomeAnnotation API', function () {
@@ -69,11 +71,50 @@ define([
                         done(); return null
                     }) 
                     .catch(function(err) {
-                        console.error(err)
+                        console.error('In ' + name + ': ' + err)
                         done.fail('Error in ' + name)
                         return null
                     })
             }, 10000)
+        }
+
+        /**
+         * Call a method, expecting a result, and failing
+         * with a detailed error if something goes wrong.
+         *
+         * Returns: the result
+         */
+        function _call_method(meth, arg1) {
+            var result_obj = null
+            try {
+                if (arg1 === undefined) {
+                    result_obj = api_obj[meth]()
+                }
+                else {
+                    result_obj = api_obj[meth](arg1)
+                }
+            }
+            catch (exc) {
+                it('get result from method ' + meth, function() {
+                    var e = exc
+                    if (exc.type == 'ThriftError') {
+                        console.error('ThriftError', exc)
+                        console.error('Examining underlying error object..')
+                        e = exc.errorObject
+                    }
+                    if (e instanceof Error) {
+                        console.error('While running method "' + meth + '": ' +
+                            'Runtime-error name=' + e.name + ' file=' + e.fileName + ':' + e.lineNumber + 
+                            ' message="' + e.message + '"')
+                        fail('Internal error (' + e.name + ')')
+                    }
+                    else {
+                        console.error('While running method "' + meth + '": ', e)
+                        fail('Unexpected exception in "' + meth + '"')
+                    }
+                })
+            }
+            return result_obj
         }
 
         // Tests
@@ -82,30 +123,45 @@ define([
         // Run the checks for all zero-argument methods.
         // Each element in the array is a pair of names:
         //   [function-name, test_data-property-name]
+        // If the second arg. is null, then skip checking the value
 
-        // []
-        //     .map(function(kvp) { 
-        //         var meth = kvp[0], attr = kvp[1]
-        //         var test_value = test_data[attr]
-        //         console.info('Test ' + meth)
-        //         _check(meth, test_value, api_obj[meth]()) 
-        //     })
+        [
+            ['get_taxon', 'taxon'],
+            ['get_assembly', null],
+            ['get_feature_types', null],
+            ['get_proteins', null]
+        ].map(function(kvp) { 
+            var meth = kvp[0], attr = kvp[1]
+            var test_value = test_data[attr] // will be undefined if attr==null
+            var result_obj = _call_method(meth)
+            // method returned, now check result value 
+            if (result_obj !== null && test_value !== undefined) {
+                _check(meth, test_value, result_obj)
+            }
+        })
 
-        // Run the checks for methods taking 1 argument
-        // (1) Empty list
-        // get_contig_lengths
-        // it('get_contig_lengths for []', function(done) {
-        //     function x() { api_obj.get_contig_lengths([]) }
-        //     expect(x).toThrow()
-        //     done(); return null
-        // }, 10000)
-        // get_contig_gc_content
-        // Check constructor variants
+        // Run the checks for methods taking a list of identifiers
+
+        var _flist = ['feature_type_descriptions', 'feature_type_counts', 'feature_ids',
+                      'features', 'feature_locations', 'feature_publications', 'feature_dna',
+                      'feature_functions', 'feature_aliases', 'cds_by_gene', 'cds_by_mrna',
+                      'gene_by_cds', 'gene_by_mrna', 'mrna_by_cds', 'mrna_by_gene']
+
+        // (1) Empty list input
+        _flist.map(function(meth) {
+            var func_name = 'get_' + meth
+            it ('Empty list input', function(done) {
+                var func = function() { api_obj[func_name]([]) }
+                expect(func).toThrow()
+                done()
+                return null
+            }, 1000)
+        })
 
         // Check constructor variants
 
         sayit = function(m) {
-            console.info('Test GenomeAnnotation API constructor ' + m)
+            console.debug('Test GenomeAnnotation API constructor ' + m)
         }
 
         sayit('without config')

@@ -150,6 +150,40 @@ define([
             }, 10000)
         }
 
+        /**
+         * Call a method, expecting a result, and failing
+         * with a detailed error if something goes wrong.
+         *
+         * Returns: the result
+         */
+        function _call_method(meth) {
+            var result_obj = null
+            try {
+                result_obj = api_obj[meth]()
+            }
+            catch (exc) {
+                it('get result from method ' + meth, function() {
+                    var e = exc
+                    if (exc.type == 'ThriftError') {
+                        console.error('ThriftError', exc)
+                        console.error('Examining underlying error object..')
+                        e = exc.errorObject
+                    }
+                    if (e instanceof Error) {
+                        console.error('While running method "' + meth + '": ' +
+                            'Runtime-error name=' + e.name + ' file=' + e.fileName + ':' + e.lineNumber + 
+                            ' message="' + e.message + '"')
+                        fail('Internal error (' + e.name + ')')
+                    }
+                    else {
+                        console.error('While running method "' + meth + '": ', e)
+                        fail('Unexpected exception in "' + meth + '"')
+                    }
+                })
+            }
+            return result_obj
+        }
+
         // Tests
         // =====
 
@@ -168,14 +202,17 @@ define([
             .map(function(kvp) { 
                 var meth = kvp[0], attr = kvp[1]
                 var test_value = test_data[attr]
-                console.info('Test ' + meth)
-                _check(meth, test_value, api_obj[meth]()) 
+                var result_obj = _call_method(meth)
+                // method returned, now check result value 
+                if (result_obj !== null) {
+                    _check(meth, test_value, result_obj)
+                }
             })
 
         // Run the checks for methods taking a list of contigs
 
         var  sayit = function(f, m) {
-            console.info('Test get_contig' + f + ' for ' + m)
+            console.debug('Test get_contig' + f + ' for ' + m)
         }
 
         // (1) Empty list

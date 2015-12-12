@@ -90,15 +90,20 @@ module.exports = function (grunt) {
 
     // Fix a Thrift-generated JS stub thrift_service.js
     function fixThriftService(content) {
-        var lintDecls = '/*global define */\n/*jslint white:true */',
+        var // Add header for Lint
+            lintDecls = '/*global define */\n/*jslint white:true */',
+            // Get second delimted token in file as the "namespace" 
             namespaceRe = /^([^\/\s\.]+)/m,
             namespace = content.match(namespaceRe)[1],
+            // Create new 'require' header and footer with the found namespace
             requireJsStart = 'define(["thrift", "' + namespace + '_types"], function (Thrift, ' + namespace + ') {\n"use strict";',
             requireJsEnd = 'return ' + namespace + ';\n});',
+            // Repair equality
             repairedContent = content
             .replace(/([^=!])==([^=])/g, '$1===$2')
             .replace(/!=([^=])/g, '!==$1');
 
+        // Return lint header + require header + content + require footer
         return [lintDecls, requireJsStart, repairedContent, requireJsEnd].join('\n');
     }
     function fixThriftLib(content) {

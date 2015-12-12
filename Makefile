@@ -33,10 +33,14 @@ rebuild:
 
 test: build runtest
 
+
 retest: rebuild runtest
 
 runtest: init karma shutdown report
 
+# The 'c' variants call 'karmac' so output goes to the console
+# instead of a file
+testc: build runtestc
 runtestc: init karmac shutdown
 
 karma: FORCE
@@ -62,6 +66,8 @@ shutdown: FORCE
 	ps auxw | grep "[c]orsproxy" | cut -c17-23 | xargs kill
 	@ sleep 2
 
+cleandown: shutdown clean
+	
 report:
 	@printf "%s\n" '---'
 	@printf "status: "
@@ -70,5 +76,8 @@ report:
 	@printf "    testing: karma.out\n"
 	@printf "    service: taxon_service.out\n"
 	@printf "    proxy: corsproxy.out\n"
+
+clean:
+	/bin/rm -f genome_annotation.out taxon.out assembly.out
 
 FORCE:
