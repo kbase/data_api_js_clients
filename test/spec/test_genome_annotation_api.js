@@ -17,7 +17,36 @@ define([
     // Expected values for GenomeAnnotation
     var test_ref = '1013/340/4'
     var test_data = { 
-        taxon: '993/616059/2'
+        taxon: '993/616059/2',
+        protein: {
+            '1013/336/4': {
+                'kb|g.166819.CDS.4524': {
+                    'aliases': {'30400': ['unknown']},
+                    'amino_acid_sequence': 'MPSTRVVFFRHAQSEFNARHSIQGQLDPPLDETGLEQVALAAPRAAAAHDDAVAVFSSDLRRASVTGRAIADALDLALIEDANLRERHLGDLQGLERASLATSVPSAFKVWKSRDRNAAVPGGGESSAGVDARLSAFFQTVSTGNYAGKKIIAVTHGGVLGRLFAGGANREEKRLCQMRRGVGNFAECVVDAYDDGTWRCHYSGWASGRFLEDSEATLQADDVA',
+                    'function': 'PF00300 ; PTHR23029 ; KOG0235 ; 5.4.2.1 ; K01834 ; Phosphoglycerate mutase family protein',
+                    'md5': 'ef681eca8190313d0843938cb9385258',
+                    'protein_id': 'kb|g.166819.CDS.4524'
+                }
+            }
+        }
+    }
+    // Example feature
+    var test_feature_id = 'kb|g.166819.CDS.4524'
+    var test_feature = {
+        'CDS_properties': {
+            'associated_mRNA': ['mRNA', 'kb|g.166819.mRNA.4350'],
+            'codes_for_protein_ref': ['1013/336/4', 'kb|g.166819.CDS.4524'],
+            'parent_gene': ['gene', 'kb|g.166819.locus.4421']},
+            'aliases': {'30400': ['unknown']
+        },
+        'dna_sequence': 'atgccgtcgaccagagtcgtctttttcaggcacgcgcagtcggagttcaacgctcgacactcaatacaaggccaactggacccaccgcttgacgaaaccggactcgaacaagttgcgctcgcggcgccgagagctgccgctgcgcacgacgacgccgtcgcggtgtttagcagcgacctccgccgcgccagcgtcaccgggcgggcgatcgcagacgccctggacttggcgctcatcgaagacgcgaacctgagagagcgtcacttgggagacttgcaaggactcgagagggcttcgctcgcgacgtcggtgccttcggcattcaaggtgtggaagtcgcgcgaccgcaacgccgccgtgcccggcggcggtgagtcgagcgcgggagtggacgcgcgattgagcgcgtttttccaaacagtaagcacgggaaactacgccggaaagaagatcatcgccgtgacgcacggcggcgtgctcggtcggctgttcgccggcggcgccaaccgcgaggaaaagcgtctgtgccagatgcgacgcggcgtcggaaacttcgccgagtgcgtcgtagacgcttatgacgacgggacgtggaggtgtcattactctggatgggcgtcggggcggtttttagaggattctgaagcgacgcttcaggcggacgacgtcgcctga',
+        'dna_sequence_length': 675,
+        'feature_id': 'kb|g.166819.CDS.4524',
+        'function': 'PF00300 ; PTHR23029 ; KOG0235 ; 5.4.2.1 ; K01834 ; Phosphoglycerate mutase family protein',
+        'locations': [['kb|g.166819.c.2', 127779, '-', 675]],
+        'md5': '2470551dfcf025b1a288ca3364905394',
+        'quality_warnings': ['Not Implemented Yet'],
+        'type': 'CDS'
     }
 
     // GenomeAnnotation API tests
@@ -142,12 +171,13 @@ define([
 
         // Run the checks for methods taking a list of identifiers
 
-        var _flist = ['feature_type_descriptions', 'feature_type_counts', 'feature_ids',
-                      'features', 'feature_locations', 'feature_publications', 'feature_dna',
-                      'feature_functions', 'feature_aliases', 'cds_by_gene', 'cds_by_mrna',
-                      'gene_by_cds', 'gene_by_mrna', 'mrna_by_cds', 'mrna_by_gene']
+        var _flist = ['feature_type_descriptions', 'feature_type_counts',
+        'feature_ids', 'features', 'feature_locations',
+        'feature_publications', 'feature_dna', 'feature_functions',
+        'feature_aliases', 'cds_by_gene', 'cds_by_mrna', 'gene_by_cds',
+        'gene_by_mrna', 'mrna_by_cds', 'mrna_by_gene']
 
-        // (1) Empty list input
+        // (1) Empty list input => Error
         _flist.map(function(meth) {
             var func_name = 'get_' + meth
             it ('Empty list input', function(done) {
@@ -157,6 +187,32 @@ define([
                 return null
             }, 1000)
         })
+        // (2) Check values returned for a single feature.
+        // Expected values are stored in `test_data` object
+        // created at the top of the file.
+        var timeout = 20000
+
+        it('has the feature with the same sequence length', 
+            function(done) {
+                api_obj.get_features([test_feature_id]).then(function(val) {
+                    var v = val[test_feature_id]
+                    expect(v.feature_dna_sequence_length).toEqual(675)
+                    done(); return null
+            })
+        }, timeout)
+
+        // it('has a protein with the same MD5 hash', 
+        //     function(done) {
+        //         api_obj.get_proteins().then(function(val) {
+        //             Object.keys(test_data.proteins).forEach(function(key) {
+        //                 console.info('@@ protein[' + key + ']=', val[key])
+        //                 expect(val[key].protein_md5).toEqual(test_data.proteins[key].md5)
+        //                 done(); return null
+        //             })
+        //             expect(val.dna_sequence_length).toEqual(675)
+        //             done(); return null
+        //     })
+        // }, timeout)
 
         // Check constructor variants
 
