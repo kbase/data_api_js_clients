@@ -231,61 +231,48 @@ define([
             done(); return null
         }, 10000)
 
-        // (2) List of 1 element
+        // Get 1..N contigs
         // get_contig_lengths
-        var contig1 = test_data.contig_id_list[0]
-        it('calls get_contig_lengths() for 1 contig', function(done) {
-            api_obj.get_contig_lengths([contig1])
-                .then(function(result) {
-                    expect(result[contig1])
-                        .toEqual(test_data.contig_lengths[contig1])
-                })
-            done(); return null
-        }, 10000)
-        // get_contig_gc_content
-        it('calls get_contig_gc_content() for 1 contig', function(done) {
-            api_obj.get_contig_gc_content([contig1])
-                .then(function(result) {
-                    expect(result[contig1])
-                        .toEqual(test_data.contig_gc_content[contig1])
-                })
-            done(); return null
-        }, 10000)
-        // get_contigs
-        it('calls get_contigs() for 1 contig', function(done) {
-            api_obj.get_contigs([contig1])
-                .then(function(result) {
-                    expect(Object.keys(result).length).toEqual(1)
-                })
-            done(); return null
-        }, 10000)
+        var contigall = test_data.contig_id_list
+        var contig_cur = [];
 
-        // List of all contigs
-        // get_contig_lengths
-        var contigall = test_data.contig_id_list
-        it('get_contig_lengths for all', function(done) {
-            api_obj.get_contig_lengths(contigall)
-                .then(function(result) {
-                    contigall.forEach(function(key) {
-                        expect(result[key]).toEqual(test_data.contig_lengths[key])
+        // Test with lists of contigs
+        // ---------------------------
+        // over 1.. contigall.length, or some limit
+        var N_contigs = Math.min(contigall.length, 2) // XXX: change to 10
+        // functions called inside the loop
+        var contig_length_func = function(done) {
+                api_obj.get_contig_lengths(contig_cur)
+                    .then(function(result) {
+                        contig_cur.forEach(function(key) {
+                            expect(result[key]).toEqual(test_data.contig_lengths[key])
+                        })
                     })
-                })
-            done(); return null
-        }, 10000)
-        // get_contig_gc_content
-        var contigall = test_data.contig_id_list
-        it('get_contig_gc_content for all', function(done) {
-            api_obj.get_contig_gc_content(contigall)
-                .then(function(result) {
-                    contigall.forEach(function(key) {
-                        expect(result[key]).not.toBe(undefined)
+                done(); return null
+            }
+        var contig_gc_func = function(done) {
+                api_obj.get_contig_gc_content(contig_cur)
+                    .then(function(result) {
+                        contig_cur.forEach(function(key) {
+                            expect(result[key]).not.toBe(undefined)
+                        })
                     })
-                })
-            done(); return null
-        }, 10000)
+                done(); return null
+            }
+        // Run the loop
+        for (var i=1; i <= N_contigs; i++)  {
+            console.info('@@ Test with list of ' + i + ' contigs')
+
+            contig_cur = contigall.slice(0, i)
+
+            console.info('@@ contig list =', contig_cur)
+            
+            it('get_contig_lengths for ' + i + ' contigs', contig_length_func, 10000)
+            it('get_contig_gc_content for ' + i + ' contigs', contig_gc_func, 10000)
+        }
 
         // Check constructor variants
-
+        // -----------------------------
          it('constructor without config', function (done) {
              var ctor = function() { Assembly() }
              expect(ctor).toThrow()
