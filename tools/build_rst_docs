@@ -1,0 +1,150 @@
+#!/usr/bin/env python
+"""
+Generate a fake ReStructured Text file from the Thrift-generated
+JSON and the existing source code documentation.
+The resulting file can be fed to 'sphinx' to create
+documentation webpages.
+
+For example, to document the Assembly.js wrapper of the assembly.thrift spec:
+
+    thrift -gen json -out . /path/to/assembly.thrift
+    ./fakerst.py assembly.json /path/to/Assembly.js asm.rst
+    sphinx asm.rst
+
+"""
+__author__ = 'Dan Gunter <dkgunter@lbl.gov>'
+
+import argparse
+from operator import itemgetter
+import json
+import os
+import re
+import sys
+
+def write_rst(input_json, output_stream, title):
+    services = input_json['services']
+    module = input_json['name'].capitalize()
+
+    output_stream.write(get_title_str(title))
+    output_stream.write('\n')
+
+    doc = RstDocRootClass(module)
+    output_stream.write(str(doc))
+    output_stream.write('\n\n')
+
+    main_service = services[0]
+    functions = main_service['functions']
+    for fn_count, fn_dict in enumerate(functions):
+        doc = RstDocFunction(module=module, **fn_dict)
+        if fn_count:
+            output_stream.write('\n\n')
+        output_stream.write(str(doc))
+
+    structs = input_json['structs']
+    for struct_count, struct_dict in enumerate(structs):
+        struct_dict['module'] = module
+        doc = RstDocStruct(**struct_dict)
+        output_stream.write('\n\n')
+        output_stream.write(str(doc))
+
+def get_title_str(title):
+    underline = '=' * len(title)
+    link = '.. _js_' + title.lower().replace(' ','_') + ':'
+    return '{}\n\n{}\n{}'.format(link, title, underline)
+
+class RstDocRootClass(object):
+    def __init__(self, class_name):
+        self.name = class_name
+
+    def __str__(self):
+        indent = '    '
+        lines = ['.. js:class:: {}(config)'.format(self.name), '',
+                 indent + ':param object config: Configuration object.',
+                 indent + ':throws ArgumentError:']
+        return '\n'.join(lines)
+
+class RstDocStruct(object):
+    def __init__(self, module=None, fields=None, name=None,
+                 isException=None):
+        assert module is not None
+        assert fields is not None
+        assert name is not None
+        self._exc = isException is not None
+        self.info = { 'module': module, 'name': name}
+        self.fields = fields
+
+    def __str__(self):
+        indent = ' ' * 4
+        lines = ['.. js:class:: {name}()\n'.format(**self.info)]
+        object_name = self.info['name']
+        for f in self.fields:
+            f['ftype'] = 'Required' if f['required'] == 'true' else 'Optional'
+            s = '    .. js:attribute:: {name} ({type}) {ftype}'.format(**f)
+            lines.append(s)
+        return '\n'.join(lines).format(**self.info)
+
+class RstDocFunction(object):
+    """Create a JavaScript documented function from the JSON output
+    of the command 'thrift -gen json'.
+    """
+    def __init__(self, name=None, doc="", arguments=None, returnType=None,
+                 exceptions=None, module=None, root_class=None):
+        assert name is not None
+        assert arguments is not None
+        assert returnType is not None
+        assert exceptions is not None
+        assert module is not None
+        arguments = arguments[2:]  # strip token, ref from beginning
+        returns = re.sub('({}\w+)'.format(module), ' :js:class:`\\1` ',
+                         returnType)
+
+        self.info = {
+            'description': (doc.strip() or 'No description.'),
+            'args': arguments,
+            'return': returns,
+            'throws': [e['type']  for e in exceptions],
+            'name': name,
+            'module': module,
+            'see_also': []
+        }
+
+    def __str__(self):
+        self.info['arglist'] = ', '.join(
+            map(itemgetter('name'), self.info['args']))
+        lines = ['.. js:function:: {name}({arglist})', '']
+        indent = '    '
+        for a in self.info['args']:
+            param = indent + ':param {type} {name}:'.format(**a)
+            lines.append(param)
+        for exc in self.info['throws']:
+            throws = indent + ':throws {}:'.format(exc)
+            lines.append(throws)
+        lines.append(indent + ':returns: {return}')
+        return '\n'.join(lines).format(**self.info)
+
+
+def cmdline():
+    p = argparse.ArgumentParser()
+    p.add_argument('json_file')
+    p.add_argument('output_file')
+    p.add_argument('-t', '--title', dest='title', help='API page title',
+                   default=None)
+    args = p.parse_args()
+    if args.title is None:
+        ofname = os.path.basename(args.output_file)
+        args.title = ofname[:ofname.find('.')].replace('_', ' ')\
+            .capitalize()\
+            .replace('api', 'API')
+    return dict(jsfile=args.json_file, outfile=args.output_file,
+                title=args.title)
+    
+def main():
+    args = cmdline()
+    with open(args['jsfile']) as infile:
+        json_data = json.load(infile)
+    with open(args['outfile'], 'w') as outfile:
+        write_rst(json_data, outfile, args['title'])
+    return 0
+    
+if __name__ == '__main__':
+    sys.exit(main())
