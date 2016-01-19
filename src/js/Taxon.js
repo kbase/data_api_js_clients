@@ -13,13 +13,14 @@ define([
     'bluebird',
     'taxon_service',
     'thrift',
-
+    'kb_data_shared',
+    
     // These don't have representations. Loading them causes the Thrift module
     // to be enhanced with additional properties (typically just a single
     //  property, the new capability added.)
     'thrift_transport_xhr',
     'thrift_protocol_binary'
-], function (Promise, taxon, Thrift) {
+], function (Promise, taxon, Thrift, KbShared) {
     'use strict';
 
     /**
@@ -33,86 +34,21 @@ define([
      * @returns {Taxon} A taxon api object
      */
     var Taxon = function (config) {
-        var objectReference,
-            dataAPIUrl,
-            authToken,
-            timeout;
 
-        // Construction argument contract enforcement, throw useful exceptions
-        if (!config) {
-            throw {
-                type: 'ArgumentError',
-                name: 'ConfigurationObjectMissing',
-                message: 'Configuration object missing',
-                suggestion: 'This is an API usage error; the taxon factory object is required to have a single configuration object as an argument.'
-            };
-        }
-        objectReference = config.ref;
-        if (!objectReference) {
-            throw {
-                type: 'ArgumentError',
-                name: 'ObjectReferenceMissing',
-                message: 'Object reference "ref" missing',
-                suggestion: 'The object reference is provided as in the "ref" argument to the config property'
-            };
-        }
-        dataAPIUrl = config.url;
-        if (!dataAPIUrl) {
-            throw {
-                type: 'ArgumentError',
-                name: 'UrlMissing',
-                message: 'Cannot find a url for the data api',
-                suggestion: 'The url is provided as in the "url" argument property'
-            };
+        KbShared.validate_config(config);
+        
+        var objectReference = config.ref,
+            dataAPIUrl = config.url,
+            authToken = config.token,
+            timeout = config.timeout;
 
-        }
-        authToken = config.token;
-        if (authToken == '' || authToken == null) {
-        }
-        else if (!authToken.match(/un=.*\|tokenid=.*/)) {
-            throw {
-                type: 'ArgumentError',
-                name: 'AuthTokenMissing',
-                message: 'Invalid Authorization found; Authorization token ' +
-                         'must match pattern "un=<name>|tokenid=<token>..."',
-                suggestion: 'Authorization is provided in the "token"' +
-                            'argument property'
-            };
-        }
-        timeout = config.timeout;
         if (!timeout) {
             timeout = 30000;
         }
 
-        /**
-         * Creates and returns an instance of the Taxon Thrift client. Note that
-         * this is
-         *
-         * @returns {Taxon_L22.taxon.thrift_serviceClient}
-         * @private
-         * @ignore
-         */
         function client() {
-             try {
-                var transport = new Thrift.TXHRTransport(dataAPIUrl, {timeout: timeout}),
-                    protocol = new Thrift.TBinaryProtocol(transport),
-                    thriftClient = new taxon.thrift_serviceClient(protocol);
-                return thriftClient;
-            } catch (ex) {
-                // Rethrow exceptions in our format:
-                if (ex.type && ex.name) {
-                    throw ex;
-                } else {
-                    throw {
-                        type: 'ThriftError',
-                        message: 'An error was encountered creating the thrift client objects',
-                        suggestion: 'This could be a configuration or runtime error. Please consult the console for the error object',
-                        errorObject: ex
-                    };
-                }
-            }
+            return KbShared.connect(Thrift, taxon, dataAPIUrl, timeout);
         }
-
 
         /**
          * If the Taxon has a parent object, this is returned. Otherwise,

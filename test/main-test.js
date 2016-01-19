@@ -37,6 +37,7 @@ requirejs.config({
         kb_data_taxon: 'js/Taxon',
         kb_data_assembly: 'js/Assembly',
         kb_data_genome_annotation: 'js/GenomeAnnotation',
+        kb_data_shared: 'js/KbShared',
         // KBase common
         kb_common_html: 'bower_components/kbase-common-js/html',
         kb_common_cookie: 'bower_components/kbase-common-js/cookie',
