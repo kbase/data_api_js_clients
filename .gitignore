@@ -1,0 +1,15 @@
+runtime/
+**/foo.py
+*.out
+docs/
+**/*-
+core-develop/
+*.pid
+*.sublime-*
+temp/
+coverage/
+node_modules/
+src/htdocs/
+bower_components/
+bower/
+**/*.ipynb
