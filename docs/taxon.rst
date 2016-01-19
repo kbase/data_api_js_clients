@@ -1,10 +1,36 @@
-.. _js_taxon:
+.. include:: ../wsref.txt
 
-Taxon
-=====
+.. _js_javascript_taxon_data_api:
+
+JavaScript Taxon Data API
+=========================
+The Taxon API can be used as a client of the Python server.
+
+.. contents::
+
+Creating a Taxon object
+----------------------
+To create a new object, instantiate :js:class:`Taxon`
+using a configuration object as the input argument.
+
+.. code-block:: javascript
+
+    // access reference data (no token required)
+    var api_obj = Taxon({
+        ref: '1013/92/2',
+        url: 'http://narrative.kbases.us',
+        token: '',
+        timeout: 6000
+    })
+
+Taxon interface
+---------------
 .. js:class:: Taxon(config)
 
-    :param object config: Configuration object.
+    :param object config: Configuration object. This object has the following fields:
+    * ref - The object reference for the object to be accessed in the format expected by the workspace: |wsref|.
+    * url - The url for the GenomeAnnotation Service endpoint.
+    * token - The KBase authorization token to be used to access the service.
     :throws ArgumentError:
 
 .. js:function:: get_info()
@@ -167,77 +193,139 @@ Taxon
     :throws TypeException:
     :returns: list<string>
 
+----
+
 .. js:class:: ObjectInfo()
 
-    .. js:attribute:: object_id (i64) Optional
-    .. js:attribute:: object_name (string) Optional
-    .. js:attribute:: object_reference (string) Optional
-    .. js:attribute:: object_reference_versioned (string) Optional
-    .. js:attribute:: type_string (string) Optional
-    .. js:attribute:: save_date (string) Optional
-    .. js:attribute:: version (i64) Optional
-    .. js:attribute:: saved_by (string) Optional
-    .. js:attribute:: workspace_id (i64) Optional
-    .. js:attribute:: workspace_name (string) Optional
-    .. js:attribute:: object_checksum (string) Optional
-    .. js:attribute:: object_size (i64) Optional
-    .. js:attribute:: object_metadata (map<string,string>) Optional
+================== ========================== ==========
+type               attr                       optional
+================== ========================== ==========
+i64                object_id                  Optional
+string             object_name                Optional
+string             object_reference           Optional
+string             object_reference_versioned Optional
+string             type_string                Optional
+string             save_date                  Optional
+i64                version                    Optional
+string             saved_by                   Optional
+i64                workspace_id               Optional
+string             workspace_name             Optional
+string             object_checksum            Optional
+i64                object_size                Optional
+map<string,string> object_metadata            Optional
+================== ========================== ==========
+
+
+----
 
 .. js:class:: ExternalDataUnit()
 
-    .. js:attribute:: resource_name (string) Optional
-    .. js:attribute:: resource_url (string) Optional
-    .. js:attribute:: resource_version (string) Optional
-    .. js:attribute:: resource_release_date (string) Optional
-    .. js:attribute:: data_url (string) Optional
-    .. js:attribute:: data_id (string) Optional
-    .. js:attribute:: description (string) Optional
+====== ===================== ==========
+type   attr                  optional
+====== ===================== ==========
+string resource_name         Optional
+string resource_url          Optional
+string resource_version      Optional
+string resource_release_date Optional
+string data_url              Optional
+string data_id               Optional
+string description           Optional
+====== ===================== ==========
+
+
+----
 
 .. js:class:: ObjectProvenanceAction()
 
-    .. js:attribute:: time (string) Optional
-    .. js:attribute:: service_name (string) Optional
-    .. js:attribute:: service_version (string) Optional
-    .. js:attribute:: service_method (string) Optional
-    .. js:attribute:: method_parameters (list<binary>) Optional
-    .. js:attribute:: script_name (string) Optional
-    .. js:attribute:: script_version (string) Optional
-    .. js:attribute:: script_command_line (string) Optional
-    .. js:attribute:: input_object_references (list<string>) Optional
-    .. js:attribute:: validated_object_references (list<string>) Optional
-    .. js:attribute:: intermediate_input_ids (list<string>) Optional
-    .. js:attribute:: intermediate_output_ids (list<string>) Optional
-    .. js:attribute:: external_data (list<ExternalDataUnit>) Optional
-    .. js:attribute:: description (string) Optional
+====================== =========================== ==========
+type                   attr                        optional
+====================== =========================== ==========
+string                 time                        Optional
+string                 service_name                Optional
+string                 service_version             Optional
+string                 service_method              Optional
+list<binary>           method_parameters           Optional
+string                 script_name                 Optional
+string                 script_version              Optional
+string                 script_command_line         Optional
+list<string>           input_object_references     Optional
+list<string>           validated_object_references Optional
+list<string>           intermediate_input_ids      Optional
+list<string>           intermediate_output_ids     Optional
+list<ExternalDataUnit> external_data               Optional
+string                 description                 Optional
+====================== =========================== ==========
+
+
+----
 
 .. js:class:: ServiceException()
 
-    .. js:attribute:: message (string) Required
-    .. js:attribute:: stacktrace (string) Optional
-    .. js:attribute:: inputs (map<string,string>) Optional
+================== ========== ==========
+type               attr       optional
+================== ========== ==========
+string             message    Required
+string             stacktrace Optional
+map<string,string> inputs     Optional
+================== ========== ==========
+
+
+----
 
 .. js:class:: AuthorizationException()
 
-    .. js:attribute:: message (string) Required
-    .. js:attribute:: stacktrace (string) Optional
+====== ========== ==========
+type   attr       optional
+====== ========== ==========
+string message    Required
+string stacktrace Optional
+====== ========== ==========
+
+
+----
 
 .. js:class:: AuthenticationException()
 
-    .. js:attribute:: message (string) Required
-    .. js:attribute:: stacktrace (string) Optional
+====== ========== ==========
+type   attr       optional
+====== ========== ==========
+string message    Required
+string stacktrace Optional
+====== ========== ==========
+
+
+----
 
 .. js:class:: ObjectReferenceException()
 
-    .. js:attribute:: message (string) Required
-    .. js:attribute:: stacktrace (string) Optional
+====== ========== ==========
+type   attr       optional
+====== ========== ==========
+string message    Required
+string stacktrace Optional
+====== ========== ==========
+
+
+----
 
 .. js:class:: AttributeException()
 
-    .. js:attribute:: message (string) Required
-    .. js:attribute:: stacktrace (string) Optional
+====== ========== ==========
+type   attr       optional
+====== ========== ==========
+string message    Required
+string stacktrace Optional
+====== ========== ==========
+
+
+----
 
 .. js:class:: TypeException()
 
-    .. js:attribute:: message (string) Required
-    .. js:attribute:: stacktrace (string) Optional
-    .. js:attribute:: valid_types (list<string>) Optional
+============ =========== ==========
+type         attr        optional
+============ =========== ==========
+string       message     Required
+string       stacktrace  Optional
+list<string> valid_types Optional
+============ =========== ==========

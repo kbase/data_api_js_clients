@@ -1,10 +1,36 @@
-.. _js_genome_annotation:
+.. include:: ../wsref.txt
 
-Genome annotation
-=================
-.. js:class:: Genome_annotation(config)
+.. _js_javascript_genome_annotation_data_api:
 
-    :param object config: Configuration object.
+JavaScript Genome annotation Data API
+=====================================
+The Genome annotation API can be used as a client of the Python server.
+
+.. contents::
+
+Creating a GenomeAnnotation object
+---------------------------------
+To create a new object, instantiate :js:class:`GenomeAnnotation`
+using a configuration object as the input argument.
+
+.. code-block:: javascript
+
+    // access reference data (no token required)
+    var api_obj = GenomeAnnotation({
+        ref: '1013/92/2',
+        url: 'http://narrative.kbases.us',
+        token: '',
+        timeout: 6000
+    })
+
+Genome annotation interface
+---------------------------
+.. js:class:: GenomeAnnotation(config)
+
+    :param object config: Configuration object. This object has the following fields:
+    * ref - The object reference for the object to be accessed in the format expected by the workspace: |wsref|.
+    * url - The url for the GenomeAnnotation Service endpoint.
+    * token - The KBase authorization token to be used to access the service.
     :throws ArgumentError:
 
 .. js:function:: get_taxon()
@@ -213,80 +239,156 @@ Genome annotation
     :throws TypeException:
     :returns: map<string,list<string>>
 
+----
+
 .. js:class:: ServiceException()
 
-    .. js:attribute:: message (string) Required
-    .. js:attribute:: stacktrace (string) Optional
-    .. js:attribute:: inputs (map<string,string>) Optional
+================== ========== ==========
+type               attr       optional
+================== ========== ==========
+string             message    Required
+string             stacktrace Optional
+map<string,string> inputs     Optional
+================== ========== ==========
+
+
+----
 
 .. js:class:: AuthorizationException()
 
-    .. js:attribute:: message (string) Required
-    .. js:attribute:: stacktrace (string) Optional
+====== ========== ==========
+type   attr       optional
+====== ========== ==========
+string message    Required
+string stacktrace Optional
+====== ========== ==========
+
+
+----
 
 .. js:class:: AuthenticationException()
 
-    .. js:attribute:: message (string) Required
-    .. js:attribute:: stacktrace (string) Optional
+====== ========== ==========
+type   attr       optional
+====== ========== ==========
+string message    Required
+string stacktrace Optional
+====== ========== ==========
+
+
+----
 
 .. js:class:: ObjectReferenceException()
 
-    .. js:attribute:: message (string) Required
-    .. js:attribute:: stacktrace (string) Optional
+====== ========== ==========
+type   attr       optional
+====== ========== ==========
+string message    Required
+string stacktrace Optional
+====== ========== ==========
+
+
+----
 
 .. js:class:: AttributeException()
 
-    .. js:attribute:: message (string) Required
-    .. js:attribute:: stacktrace (string) Optional
+====== ========== ==========
+type   attr       optional
+====== ========== ==========
+string message    Required
+string stacktrace Optional
+====== ========== ==========
+
+
+----
 
 .. js:class:: TypeException()
 
-    .. js:attribute:: message (string) Required
-    .. js:attribute:: stacktrace (string) Optional
-    .. js:attribute:: valid_types (list<string>) Optional
+============ =========== ==========
+type         attr        optional
+============ =========== ==========
+string       message     Required
+string       stacktrace  Optional
+list<string> valid_types Optional
+============ =========== ==========
+
+
+----
 
 .. js:class:: Region()
 
-    .. js:attribute:: contig_id (string) Optional
-    .. js:attribute:: strand (string) Optional
-    .. js:attribute:: start (i64) Optional
-    .. js:attribute:: length (i64) Optional
+====== ========= ==========
+type   attr      optional
+====== ========= ==========
+string contig_id Optional
+string strand    Optional
+i64    start     Optional
+i64    length    Optional
+====== ========= ==========
+
+
+----
 
 .. js:class:: Feature_id_filters()
 
-    .. js:attribute:: type_list (list<string>) Optional
-    .. js:attribute:: region_list (list<Region>) Optional
-    .. js:attribute:: function_list (list<string>) Optional
-    .. js:attribute:: alias_list (list<string>) Optional
+============ ============= ==========
+type         attr          optional
+============ ============= ==========
+list<string> type_list     Optional
+list<Region> region_list   Optional
+list<string> function_list Optional
+list<string> alias_list    Optional
+============ ============= ==========
+
+
+----
 
 .. js:class:: Feature_id_mapping()
 
-    .. js:attribute:: by_type (map<string,list<string>>) Optional
-    .. js:attribute:: by_region (map<string,map<string,map<string,list<string>>>>) Optional
-    .. js:attribute:: by_function (map<string,list<string>>) Optional
-    .. js:attribute:: by_alias (map<string,list<string>>) Optional
+================================================ =========== ==========
+type                                             attr        optional
+================================================ =========== ==========
+map<string,list<string>>                         by_type     Optional
+map<string,map<string,map<string,list<string>>>> by_region   Optional
+map<string,list<string>>                         by_function Optional
+map<string,list<string>>                         by_alias    Optional
+================================================ =========== ==========
+
+
+----
 
 .. js:class:: Feature_data()
 
-    .. js:attribute:: feature_id (string) Optional
-    .. js:attribute:: feature_type (string) Optional
-    .. js:attribute:: feature_function (string) Optional
-    .. js:attribute:: feature_aliases (map<string,list<string>>) Optional
-    .. js:attribute:: feature_dna_sequence_length (i64) Optional
-    .. js:attribute:: feature_dna_sequence (string) Optional
-    .. js:attribute:: feature_md5 (string) Optional
-    .. js:attribute:: feature_locations (list<Region>) Optional
-    .. js:attribute:: feature_publications (list<string>) Optional
-    .. js:attribute:: feature_quality_warnings (list<string>) Optional
-    .. js:attribute:: feature_quality_score (list<string>) Optional
-    .. js:attribute:: feature_notes (list<string>) Optional
-    .. js:attribute:: feature_inference (string) Optional
+======================== =========================== ==========
+type                     attr                        optional
+======================== =========================== ==========
+string                   feature_id                  Optional
+string                   feature_type                Optional
+string                   feature_function            Optional
+map<string,list<string>> feature_aliases             Optional
+i64                      feature_dna_sequence_length Optional
+string                   feature_dna_sequence        Optional
+string                   feature_md5                 Optional
+list<Region>             feature_locations           Optional
+list<string>             feature_publications        Optional
+list<string>             feature_quality_warnings    Optional
+list<string>             feature_quality_score       Optional
+list<string>             feature_notes               Optional
+string                   feature_inference           Optional
+======================== =========================== ==========
+
+
+----
 
 .. js:class:: Protein_data()
 
-    .. js:attribute:: protein_id (string) Optional
-    .. js:attribute:: protein_amino_acid_sequence (string) Optional
-    .. js:attribute:: protein_function (string) Optional
-    .. js:attribute:: protein_aliases (list<string>) Optional
-    .. js:attribute:: protein_md5 (string) Optional
-    .. js:attribute:: protein_domain_locations (list<string>) Optional
+============ =========================== ==========
+type         attr                        optional
+============ =========================== ==========
+string       protein_id                  Optional
+string       protein_amino_acid_sequence Optional
+string       protein_function            Optional
+list<string> protein_aliases             Optional
+string       protein_md5                 Optional
+list<string> protein_domain_locations    Optional
+============ =========================== ==========

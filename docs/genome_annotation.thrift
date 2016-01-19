@@ -57,10 +57,10 @@ struct Feature_id_filters {
 }
 
 struct Feature_id_mapping {
-    1: map<string, list<string>> by_type = [ ];
-    2: map<string, map<string, map<string, list<string>>>> by_region = { };
-    3: map<string, list<string>> by_function = [ ];
-    4: map<string, list<string>> by_alias = { };
+    1: map<string, list<string>> by_type = {};
+    2: map<string, map<string, map<string, list<string>>>> by_region = {};
+    3: map<string, list<string>> by_function = {};
+    4: map<string, list<string>> by_alias = {};
 }
 
 struct Feature_data {

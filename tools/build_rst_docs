@@ -1,16 +1,10 @@
 #!/usr/bin/env python
 """
-Generate a fake ReStructured Text file from the Thrift-generated
-JSON and the existing source code documentation.
-The resulting file can be fed to 'sphinx' to create
+Generate a ReStructured Text documentation file from the Thrift-generated
+JSON. The resulting file can be fed to 'sphinx' to create
 documentation webpages.
 
-For example, to document the Assembly.js wrapper of the assembly.thrift spec:
-
-    thrift -gen json -out . /path/to/assembly.thrift
-    ./fakerst.py assembly.json /path/to/Assembly.js asm.rst
-    sphinx asm.rst
-
+See the Makefile in the docs/ directory for usage.
 """
 __author__ = 'Dan Gunter <dkgunter@lbl.gov>'
 
@@ -21,14 +15,14 @@ import os
 import re
 import sys
 
-def write_rst(input_json, output_stream, title):
+def write_rst(input_json, output_stream, title, classname):
     services = input_json['services']
     module = input_json['name'].capitalize()
 
-    output_stream.write(get_title_str(title))
-    output_stream.write('\n')
+    output_stream.write(get_title_text(title, classname))
+    output_stream.write(get_preamble_text(title, classname))
 
-    doc = RstDocRootClass(module)
+    doc = RstDocRootClass(classname)
     output_stream.write(str(doc))
     output_stream.write('\n\n')
 
@@ -47,10 +41,49 @@ def write_rst(input_json, output_stream, title):
         output_stream.write('\n\n')
         output_stream.write(str(doc))
 
-def get_title_str(title):
+def get_title_text(title, classname):
+    title = 'JavaScript ' + title + ' Data API'
     underline = '=' * len(title)
     link = '.. _js_' + title.lower().replace(' ','_') + ':'
-    return '{}\n\n{}\n{}'.format(link, title, underline)
+    return '.. include:: ../wsref.txt\n\n{}\n\n{}\n{}\n'.format(link, title, underline)
+
+def get_preamble_text(title, classname):
+    example = '{i}// access reference data (no token required)\n'\
+              '{i}var api_obj = {c}({{\n' \
+              '{i}{i}ref: \'{r}\',\n' \
+              '{i}{i}url: \'{u}\',\n' \
+              '{i}{i}token: \'\',\n' \
+              '{i}{i}timeout: 6000\n' \
+              '{i}}})'.format(c=classname,
+                              u='http://narrative.kbases.us',
+                              r='1013/92/2',
+                              i='    ')
+    fmt_args = {
+        'title': title,
+        'class': classname,
+        'a_n': 'n' if title.lower()[0] in 'aeiou' else '',
+        'example_text': '.. code-block:: javascript\n\n{}'.format(example)
+    }
+    fmt_args.update({
+        'underdash1': '-' * (len(fmt_args['class']) + 17 + len(fmt_args['a_n'])),
+        'underdash2': '-' * (len(fmt_args['title']) + 10),
+    })
+    s =\
+'''The {title} API can be used as a client of the Python server.
+
+.. contents::
+
+Creating a{a_n} {class} object
+{underdash1}
+To create a new object, instantiate :js:class:`{class}`
+using a configuration object as the input argument.
+
+{example_text}
+
+{title} interface
+{underdash2}
+'''
+    return s.format(**fmt_args)
 
 class RstDocRootClass(object):
     def __init__(self, class_name):
@@ -58,8 +91,14 @@ class RstDocRootClass(object):
 
     def __str__(self):
         indent = '    '
+        cfg = ['* ref - The object reference for the object to be accessed in the format expected by the workspace: |wsref|.',
+               '* url - The url for the GenomeAnnotation Service endpoint.',
+               '* token - The KBase authorization token to be used to access the '
+               'service.']
         lines = ['.. js:class:: {}(config)'.format(self.name), '',
-                 indent + ':param object config: Configuration object.',
+                 indent + ':param object config: Configuration object.'
+                          ' This object has the following fields:',
+                 '\n'.join(['    ' + line for line in cfg]),
                  indent + ':throws ArgumentError:']
         return '\n'.join(lines)
 
@@ -75,12 +114,29 @@ class RstDocStruct(object):
 
     def __str__(self):
         indent = ' ' * 4
-        lines = ['.. js:class:: {name}()\n'.format(**self.info)]
+        lines = ['----', '', '.. js:class:: {name}()\n'.format(**self.info)]
         object_name = self.info['name']
+        lengths = {'tlen': max([len(f['type']) for f in self.fields]),
+                   'nlen': max([len(f['name']) for f in self.fields]),
+                   'ftlen': 10}
+        header = '{{:{tlen}s}} {{:{nlen}s}} optional'.format(**lengths)\
+            .format('type', 'attr')
+        border = '{} {} {}'.format('=' * lengths['tlen'],
+                                   '=' * lengths['nlen'],
+                                   '=' * lengths['ftlen'])
+        lines.extend([border,
+                     #'Members',
+                     #'-' * (sum(lengths.values()) + len(lengths) - 1),
+                     header,
+                     border])
+
         for f in self.fields:
             f['ftype'] = 'Required' if f['required'] == 'true' else 'Optional'
-            s = '    .. js:attribute:: {name} ({type}) {ftype}'.format(**f)
+            s = '{{type:{tlen}s}} {{name:{nlen}s}} {{ftype}}'.format(
+                    **lengths).format(**f)
             lines.append(s)
+        lines.append(border)
+        lines.append('')
         return '\n'.join(lines).format(**self.info)
 
 class RstDocFunction(object):
@@ -129,21 +185,26 @@ def cmdline():
     p.add_argument('output_file')
     p.add_argument('-t', '--title', dest='title', help='API page title',
                    default=None)
+    p.add_argument('-c', '--class', dest='classname', help='API class name',
+                   default=None)
     args = p.parse_args()
     if args.title is None:
         ofname = os.path.basename(args.output_file)
-        args.title = ofname[:ofname.find('.')].replace('_', ' ')\
+        ofname = os.path.splitext(ofname)[0]
+        args.title = ofname.replace('_', ' ')\
             .capitalize()\
             .replace('api', 'API')
+        args.classname = ''.join([tok.capitalize()
+                                  for tok in ofname.split('_')])
     return dict(jsfile=args.json_file, outfile=args.output_file,
-                title=args.title)
+                title=args.title, classname=args.classname)
     
 def main():
     args = cmdline()
     with open(args['jsfile']) as infile:
         json_data = json.load(infile)
     with open(args['outfile'], 'w') as outfile:
-        write_rst(json_data, outfile, args['title'])
+        write_rst(json_data, outfile, args['title'], args['classname'])
     return 0
     
 if __name__ == '__main__':

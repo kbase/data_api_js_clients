@@ -28,11 +28,12 @@ push:
 	@mkdir -p ${COREDOC_DIR}/js
 	@for f in ${RST_FILES}; do \
 		 cp $$f ${COREDOC_DIR}/js; \
-		 printf "Copying $$f to ${COREDOC_DIR}/js/$$f\n"; \
+		 printf "cp $$f ${COREDOC_DIR}/js/$$f\n"; \
 	done
-	
+	cp index.rst ${COREDOC_DIR}/javascript.rst
+
 %.json : %.thrift
 	thrift -gen json -out . $<
-	
+
 %.rst : %.json
 	${BUILD} $< $@
