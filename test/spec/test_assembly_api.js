@@ -211,6 +211,7 @@ define([
 
         // Run the checks for methods taking a list of contigs
 
+
         // (1) Empty list
         // get_contig_lengths
         it('calls get_contig_lengths() for an empty list', function(done) {
@@ -231,7 +232,8 @@ define([
             done(); return null
         }, 10000)
 
-        // Get 1..N contigs
+
+       // Get 1..N contigs
         // get_contig_lengths
         var contigall = test_data.contig_id_list
         var contig_cur = [];
@@ -239,7 +241,7 @@ define([
         // Test with lists of contigs
         // ---------------------------
         // over 1.. contigall.length, or some limit
-        var N_contigs = Math.min(contigall.length, 2) // XXX: change to 10
+        var N_contigs = Math.min(contigall.length, 4) // XXX: change to 10
         // functions called inside the loop
         var contig_length_func = function(done) {
                 api_obj.get_contig_lengths(contig_cur)
@@ -261,14 +263,11 @@ define([
             }
         // Run the loop
         for (var i=1; i <= N_contigs; i++)  {
-            console.info('@@ Test with list of ' + i + ' contigs')
 
             contig_cur = contigall.slice(0, i)
-
-            console.info('@@ contig list =', contig_cur)
             
             it('get_contig_lengths for ' + i + ' contigs', contig_length_func, 10000)
-            it('get_contig_gc_content for ' + i + ' contigs', contig_gc_func, 10000)
+            //it('get_contig_gc_content for ' + i + ' contigs', contig_gc_func, 10000)
         }
 
         // Check constructor variants
