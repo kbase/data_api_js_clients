@@ -30,6 +30,8 @@ define([
      * @param {ObjectReference} config.ref The object reference for the object to be accessed.
      * @param {string} config.url The url for the Assembly Service endpoint.
      * @param {string} config.token The KBase authorization token to be used to access the service.
+     * @throws ArgumentError Possible reasons, found in the `.name` attribute, are:
+     *   ConfigurationObjectMissing, ObjectReferenceMissing, UrlMissing, and AuthTokenMissing
      * @returns {Assembly} A Assembly api object
      */
     var Assembly = function (config) {
@@ -89,7 +91,7 @@ define([
 
         /**
          * Creates and returns an instance of the Assembly Thrift client. Note that
-         * this is
+         * this is...??
          *
          * @returns {Taxon_L22.assembly.thrift_serviceClient}
          * @private
@@ -120,8 +122,6 @@ define([
         // Mapping for public methods
 
         var _exports = {}
-
-        // Zero-argument methods
 
         var _flist = [
             'assembly_id', 'genome_annotations', 'external_source_info',
