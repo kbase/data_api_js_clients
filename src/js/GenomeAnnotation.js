@@ -70,7 +70,7 @@ define([
         // Methods taking a list of string identifiers as its only argument
 
         flist = [
-            'feature_type_descriptions', 'feature_type_counts', 'feature_ids',
+            'feature_type_descriptions', 'feature_type_counts',
             'features', 'feature_locations', 'feature_publications', 'feature_dna',
             'feature_functions', 'feature_aliases', 'cds_by_gene', 'cds_by_mrna',
             'gene_by_cds', 'gene_by_mrna', 'mrna_by_cds', 'mrna_by_gene'];
@@ -96,7 +96,8 @@ define([
 
         // 'feature_ids' takes 2 extra arguments, a list of fileters and a group type
 
-        exports.get_feature_ids = function(filters, group_type) {
+        var fname = 'get_feature_ids';
+        exports[fname] = function(filters, group_type) {
             return Promise.resolve(client()[fname](authToken,
                 objectReference, filters, group_type, true))            
         }
