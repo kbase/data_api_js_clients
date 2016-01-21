@@ -53,6 +53,20 @@ In the following instructions, it will be assumed unless otherwise stated that t
     
     If this works, the last line of the Grunt output will say `Done, without errors.`
     
+## Examples
+
+There are some examples in the `examples/` directory. Before running these, you need to start up the Data API services. There is a top-level Makefile with convenient commands for this:
+
+    make shutdown # stop anything currently going
+    make build # only need to do this once, make sure stubs are all built
+    make init # start the Data API services
+    
+Then, you can load the examples into your browser by simply navigating to the directory and opening the 'index.html' file:
+
+    # Open "Hello, world" example on Mac OSX
+    cd examples/helloworld
+    open index.html
+
 ## Testing
 
 All the JavaScript tests and tools, unless otherwise stated, should be run from the same directory as this README.
