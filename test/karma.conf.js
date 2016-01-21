@@ -28,7 +28,7 @@ module.exports = function(config) {
         'karma-requirejs',
         'karma-chrome-launcher',
         'karma-firefox-launcher',
-        'karma-safari-launcher'
+//        'karma-safari-launcher'
     ],
 
 
@@ -46,7 +46,8 @@ module.exports = function(config) {
       {pattern: 'runtime/build/js/*.js', included: false},
       {pattern: 'runtime/build/js/**/*.js', included: false},
       {pattern: 'runtime/build/bower_components/**/*.js', included: false},
-      {pattern: 'test/spec/**/*.js', included: false},
+      //{pattern: 'test/spec/**/*.js', included: false},
+      {pattern: 'test/spec/*.js', included: false},
       //{pattern: 'runtime/build/config/config.yml', included: false},
 
       'test/main-test.js',
@@ -62,35 +63,26 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
 
-//    preprocessors: {
-//      'build/client/!(bower_components)/**/*.js': ['coverage']
-//    },
-//
-//    coverageReporter: {
-//      dir: 'build/test-coverage/',
-//      reporters: [
-//        { type: 'html', subdir: 'html' },
-//        { type: 'lcov', subdir: 'lcov' }
-//      ]
-//    },
+    preprocessors: {
+      'runtime/build/js/*.js': 'coverage'
+    },
 
-    // test results reporter to use
-    // possible values: 'dots', 'progress'
-    // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    //reporters: ['progress', 'coverage'],
-    reporters: ['progress'],
+    coverageReporter: {
+      dir: 'coverage/',
+      reporters: [
+        { type: 'lcov', subdir: 'lcov' },
+        { type: 'text', file: 'coverage.txt' }
+      ]
+    },
 
-//    coverageReporter: {
-//      type : 'html',
-//      dir : 'coverage/'
-//    },
+    reporters: ['progress', 'coverage'],
 
     // web server port
     port: 9876,
 
 
     // enable / disable colors in the output (reporters and logs)
-    colors: true,
+    colors: false,
 
 
     // level of logging
@@ -106,7 +98,7 @@ module.exports = function(config) {
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     // browsers: ['PhantomJS', 'Chrome', 'Firefox', 'Safari'],
 
-    browsers: [chrome_browser, firefox_browser],
+    browsers: [chrome_browser /*, firefox_browser*/],
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits

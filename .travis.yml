@@ -12,10 +12,11 @@ cache:
 
 
 before_install:
+  - export PATH=$PATH:`pwd`/node_modules/.bin
   - git clone -b develop https://github.com/kbase/data_api.git core-develop
   - ( cd core-develop && git submodule init && git submodule update )
   - npm install -g bower
- 
+
 install:
   - cd core-develop
   - pip install -r requirements.txt
@@ -30,28 +31,29 @@ before_script:
   # Run services
   - data_api_start_service.py --service taxon --config deployment.cfg > taxonAPI.out 2>&1 &
   - data_api_start_service.py --service assembly --config deployment.cfg > assemblyAPI.out 2>&1 &
-#  - data_api_start_service.py --service genomeannotation --config deployment.cfg > gaAPI.out 2>&1 &
+  - data_api_start_service.py --service genome_annotation --config deployment.cfg > gaAPI.out 2>&1 &
   - export DISPLAY=:99.0
   - export CHROME_BIN=chromium-browser
   - sh -e /etc/init.d/xvfb start
   - sleep 3 # give xvfb some time to start
-  - CORSPROXY_PORT=8000 ./node_modules/corsproxy/bin/corsproxy &
+  - CORSPROXY_PORT=8000 ./node_modules/.bin/corsproxy &
   - redis-server redis.conf &
 
 script:
-  - ./node_modules/karma-cli/bin/karma start test/karma.conf.js
+  - ls -lR runtime/build/js/  # debugging
+  - karma start test/karma.conf.js
 
 env:
-  - KB_DEPLOY_URL="dir_cache"
+#  - KB_DEPLOY_URL="dir_cache" -- some odd failure due to Redis updating its persistent store
   - KB_DEPLOY_URL="dir_nocache"
 #  - KB_REDIS_HOST=localhost; KB_NOSE_CFG=nose-ci.cfg
 #  - KB_REDIS_HOST="";        KB_NOSE_CFG=nose-ci.cfg
 
 after_success:
-#  - codecov
+  - cat coverage/lcov/lcov.info | ./node_modules/.bin/codecov
   - kill $(cat taxonAPI.pid)
   - kill $(cat assemblyAPI.pid)
-#  - kill $(cat genomeannotationAPI.pid)
+  - kill $(cat genomeannotationAPI.pid)
 # Make service logs easy to inspect, then clean up
   - cat taxonAPI.out
   - cat assemblyAPI.out

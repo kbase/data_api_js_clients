@@ -13,6 +13,8 @@
   "dependencies": {},
   "devDependencies": {
     "bower": "1.6.5",
+    "codecov.io": "0.1.6",
+    "corsproxy": "1.4.0",
     "grunt": "^0.4.5",
     "grunt-bower-task": "0.4.0",
     "grunt-contrib-clean": "^0.6.0",
@@ -21,6 +23,9 @@
     "grunt-markdown": "0.7.0",
     "grunt-mkdir": "0.1.2",
     "grunt-shell": "1.1.2",
+    "grunt-connect": "0.2.0",
+    "grunt-open": "0.2.3",
+    "istanbul": "0.4.1",
     "jasmine": "2.3.2",
     "jasmine-core": "^2.3.4",
     "karma": "^0.13.14",
@@ -31,13 +36,13 @@
     "karma-jasmine": "0.3.6",
     "karma-requirejs": "0.2.2",
     "karma-safari-launcher": "0.1.1",
-    "requirejs": "^2.1.20",
-    "grunt-connect": "0.2.0",
-    "grunt-open": "0.2.3",
-    "corsproxy": "1.4.0"
+    "requirejs": "^2.1.20"
   },
   "repository": {
       "type": "git",
       "url": "https://github.com/kbase/data_api_js_clients"
+  },
+  "jshintConfig": {
+      "asi": true
   }
 }

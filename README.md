@@ -1,8 +1,8 @@
 **Version: 0.1.0**
 
-Last modified: 23 November 2015
-
-[![Build Status](https://travis-ci.org/kbase/data_api_js_clients.svg?branch=develop)](https://travis-ci.org/kbase/data_api_js_clients)
+[![Build Status](https://travis-ci.org/dangunter/data_api_js_clients.svg)](https://travis-ci.org/dangunter/data_api_js_clients)
+[![codecov.io](https://codecov.io/github/dangunter/data_api_js_clients/coverage.svg?branch=master)](https://codecov.io/github/dangunter/data_api_js_clients?branch=master)
+![codecov.io](https://codecov.io/github/dangunter/data_api_js_clients/branch.svg?branch=master)
 
 # JavaScript API Wrappers for the Data API
 
@@ -53,11 +53,26 @@ In the following instructions, it will be assumed unless otherwise stated that t
     
     If this works, the last line of the Grunt output will say `Done, without errors.`
     
+## Examples
+
+There are some examples in the `examples/` directory. Before running these, you need to start up the Data API services. There is a top-level Makefile with convenient commands for this:
+
+    make shutdown # stop anything currently going
+    make build # only need to do this once, make sure stubs are all built
+    make init # start the Data API services
+    
+Then, you can load the examples into your browser by simply navigating to the directory and opening the 'index.html' file:
+
+    # Open "Hello, world" example on Mac OSX
+    cd examples/helloworld
+    open index.html
+
 ## Testing
 
 All the JavaScript tests and tools, unless otherwise stated, should be run from the same directory as this README.
 
 We use [Karma](https://karma-runner.github.io) to run the JavaScript code. Tests run against the following browsers/platforms:
+
     * chrome
     * safari  --- EEK! not working yet!!
     * firefox
@@ -68,38 +83,9 @@ Tests themselves are in `test/spec` and are usually named `test_<type>_api.js`, 
 
 ### Running the tests
 
-* Make sure the version of Karma and the proxy server ("corsproxy") that was installed by grunt is the first one in your PATH. As usual for PATH modifications, you need to do this once per shell instance; the easiest way to automate this is put it in your startup files (e.g., "$HOME/.bashrc"). The command below should be run from the top-level of the cloned repository.
-
-        export PATH=`pwd`/node_modules/karma-cli/bin/karma:`pwd`/node_modules/corsproxy/bin:$PATH
-    
-      
-* Run the corsproxy on port 8000
-
-        CORSPROXY_PORT=8000 corsproxy &
-    
-    The output should look something like this:
-        
-        151123/114601.036, [log,info], data: CORS Proxy running at: http://localhost:8000
-
- 
-* Run the Data API service of choice -- here, Taxon -- using the configuration in `data_api-test.cfg`
-
-        data_api_start_service.py --config data_api-test.cfg --kbase_url core-develop/test --service taxon &
-        
-    You can add `-v` for very verbose messages to stderr. The last 2 lines of the output (without `-v`), will look like this:
-
-        2015-11-23 11:47:50,890 [INFO] Starting service: port=9101, PID=36560
-        2015-11-23 11:47:51,030 [INFO] Starting the server...
-
-* Now you can run the Karma tests
-
-        karma start test/karma.conf.js
-
-    If this works, you should see lines like this at the end of the output:
-    
-        Chrome 46.0.2490 (Mac OS X 10.11.1): Executed 2 of 2 SUCCESS (4.083 secs / 4.087 secs)
-        Firefox 41.0.0 (Mac OS X 10.11.0): Executed 2 of 2 SUCCESS (3.466 secs / 3.467 secs)
-        TOTAL: 4 SUCCESS
+For developer convenience, running local tests has been automated in a 'Makefile' in the
+top-level directory. Run the command `make` to see available targets, and examine the
+file contents to see how to modify and run the steps yourself.
     
 ### TravisCI
 
