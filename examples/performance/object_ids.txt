@@ -1,0 +1,79 @@
+kb|g.140105
+Hordeum vulgare
+Eukaryota
+11.05
+118,942
+62,240
+4,706,057,868
+2.
+kb|g.140106
+Triticum aestivum
+Eukaryota
+45.09
+731,921
+107,902
+4,460,384,120
+3.
+kb|g.140104
+Triticum urartu
+Eukaryota
+36.57
+499,221
+33,424
+3,747,047,519
+4.
+kb|g.140056
+Aegilops tauschii
+Eukaryota
+37.32
+429,891
+33,849
+3,313,650,219
+5.
+kb|g.166802
+Zea mays
+Eukaryota
+46.59
+523
+88,760
+2,067,864,162
+6.
+kb|g.217875
+Panicum virgatum
+Eukaryota
+33.68
+220,664
+125,439
+1,697,286,449
+7.
+kb|g.166821
+Panicum virgatum
+Eukaryota
+46.46
+410,030
+70,071
+1,358,078,670
+8.
+kb|g.217869
+Glycine max
+Eukaryota
+33.94
+1,190
+88,647
+978,495,272
+9.
+kb|g.140101
+Glycine max
+Eukaryota
+34.10
+1,168
+73,319
+973,344,380
+10.
+kb|g.166816
+Malus domestica
+Eukaryota
+37.31
+122,107
+63,517
+881,278,625
