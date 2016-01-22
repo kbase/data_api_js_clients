@@ -20,7 +20,8 @@ def write_rst(input_json, output_stream, title, classname):
     module = input_json['name'].capitalize()
 
     output_stream.write(get_title_text(title, classname))
-    output_stream.write(get_preamble_text(title, classname))
+    method, varname = choose_example_method(services)
+    output_stream.write(get_preamble_text(title, classname, method, varname))
 
     doc = RstDocRootClass(classname)
     output_stream.write(str(doc))
@@ -34,6 +35,15 @@ def write_rst(input_json, output_stream, title, classname):
             output_stream.write('\n\n')
         output_stream.write(str(doc))
 
+    typedefs = input_json['typedefs']
+    for td_count, td_dict in enumerate(typedefs):
+        td_dict['module'] = module
+        td_dict['type_'] = td_dict['type']
+        del td_dict['type']
+        doc = RstDocTypedef(**td_dict)
+        output_stream.write('\n\n')
+        output_stream.write(str(doc))
+        
     structs = input_json['structs']
     for struct_count, struct_dict in enumerate(structs):
         struct_dict['module'] = module
@@ -41,28 +51,48 @@ def write_rst(input_json, output_stream, title, classname):
         output_stream.write('\n\n')
         output_stream.write(str(doc))
 
+def choose_example_method(service_json):
+    method_name, result_var_name = 'foo', 'bar'
+    functions = service_json[0]['functions']
+    for fn in functions:
+        if (fn['name'].startswith('get_') and len(fn['arguments']) == 2 and 
+            not '<' in fn['returnType']):
+            method_name = fn['name']
+            result_var_name = method_name[4:]
+            break
+    return method_name, result_var_name
+    
 def get_title_text(title, classname):
     title = 'JavaScript ' + title + ' Data API'
     underline = '=' * len(title)
     link = '.. _js_' + title.lower().replace(' ','_') + ':'
     return '.. include:: ../wsref.txt\n\n{}\n\n{}\n{}\n'.format(link, title, underline)
 
-def get_preamble_text(title, classname):
-    example = '{i}// access reference data (no token required)\n'\
-              '{i}var api_obj = {c}({{\n' \
-              '{i}{i}ref: \'{r}\',\n' \
-              '{i}{i}url: \'{u}\',\n' \
-              '{i}{i}token: \'\',\n' \
-              '{i}{i}timeout: 6000\n' \
-              '{i}}})'.format(c=classname,
+def get_preamble_text(title, classname, example_method, example_varname):
+    init = ('{i}// access reference data (no token required)\n'
+              '{i}var api_obj = {c}({{\n'
+              '{i}{i}ref: \'{r}\',\n'
+              '{i}{i}url: \'{u}\',\n'
+              '{i}{i}token: \'\',\n'
+              '{i}{i}timeout: 6000\n'
+              '{i}}});').format(c=classname,
                               u='http://narrative.kbases.us',
                               r='1013/92/2',
                               i='    ')
+                              
+    usage = ('{i}// call function using Promise interface\n'
+              '{i}api_obj.{method}().then(\n'
+              '{i}{i}function({var}) {{\n'
+              '{i}{i}{i}do_something_with({var});\n'
+              '{i}}});').format(method=example_method,
+                                var=example_varname, i='    ')
+
     fmt_args = {
         'title': title,
         'class': classname,
         'a_n': 'n' if title.lower()[0] in 'aeiou' else '',
-        'example_text': '.. code-block:: javascript\n\n{}'.format(example)
+        'example_init': '.. code-block:: javascript\n\n{}'.format(init),
+        'example_usage': '.. code-block:: javascript\n\n{}'.format(usage)
     }
     fmt_args.update({
         'underdash1': '-' * (len(fmt_args['class']) + 17 + len(fmt_args['a_n'])),
@@ -73,17 +103,35 @@ def get_preamble_text(title, classname):
 
 .. contents::
 
-Creating a{a_n} {class} object
+Creating and using a{a_n} {class} object
 {underdash1}
 To create a new object, instantiate :js:class:`{class}`
 using a configuration object as the input argument.
 
-{example_text}
+{example_init}
+
+To use the object, call the Promise-wrapped functions
+and process the results accordingly.
+
+{example_usage}
 
 {title} interface
 {underdash2}
 '''
     return s.format(**fmt_args)
+
+def add_type_links(value):
+    """Replace type names with a link to the definition.
+
+    Type names are recognized by the convention of starting with an
+    uppercase letter.
+    """
+    vs = value.strip()
+    backquoted = vs.startswith('``') and vs.endswith('``')
+    quote = '``' if backquoted else ''
+    result = re.sub('([A-Z]\w+)', '{q} :js:class:`\\1` {q}'.format(q=quote), vs)
+    result = result.replace('````', '')  # remove empty backquoted sections
+    return result
 
 class RstDocRootClass(object):
     def __init__(self, class_name):
@@ -139,6 +187,24 @@ class RstDocStruct(object):
         lines.append('')
         return '\n'.join(lines).format(**self.info)
 
+class RstDocTypedef(object):
+    def __init__(self, module=None, name=None, type_=None):
+        assert module is not None
+        assert type_ is not None
+        assert name is not None
+        self.info = { 
+            'module': module, 
+            'name': name,
+            'type': add_type_links('``' + type_ + '``')
+        }
+
+    def __str__(self):
+        indent = ' ' * 4
+        lines = ['----', '', '.. js:data:: {name}\n'.format(**self.info)]
+        lines.append('')
+        lines.append(indent + self.info['type'])
+        return '\n'.join(lines)
+    
 class RstDocFunction(object):
     """Create a JavaScript documented function from the JSON output
     of the command 'thrift -gen json'.
@@ -151,27 +217,33 @@ class RstDocFunction(object):
         assert exceptions is not None
         assert module is not None
         arguments = arguments[2:]  # strip token, ref from beginning
-        returns = re.sub('({}\w+)'.format(module), ' :js:class:`\\1` ',
-                         returnType)
 
         self.info = {
             'description': (doc.strip() or 'No description.'),
             'args': arguments,
-            'return': returns,
+            'return': add_type_links('``' + returnType + '``'),
             'throws': [e['type']  for e in exceptions],
             'name': name,
             'module': module,
             'see_also': []
         }
 
+
     def __str__(self):
         self.info['arglist'] = ', '.join(
             map(itemgetter('name'), self.info['args']))
         lines = ['.. js:function:: {name}({arglist})', '']
         indent = '    '
+        # add docstring
+        for docline in self.info['description'].split('\n'):
+            if docline.strip():
+                lines.append(indent + docline)
+        lines.append('')
+        # add args
         for a in self.info['args']:
             param = indent + ':param {type} {name}:'.format(**a)
             lines.append(param)
+        # add exceptions
         for exc in self.info['throws']:
             throws = indent + ':throws {}:'.format(exc)
             lines.append(throws)
