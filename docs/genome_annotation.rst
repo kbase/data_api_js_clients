@@ -8,7 +8,7 @@ The Genome annotation API can be used as a client of the Python server.
 
 .. contents::
 
-Creating a GenomeAnnotation object
+Creating and using a GenomeAnnotation object
 ---------------------------------
 To create a new object, instantiate :js:class:`GenomeAnnotation`
 using a configuration object as the input argument.
@@ -21,7 +21,18 @@ using a configuration object as the input argument.
         url: 'http://narrative.kbases.us',
         token: '',
         timeout: 6000
-    })
+    });
+
+To use the object, call the Promise-wrapped functions
+and process the results accordingly.
+
+.. code-block:: javascript
+
+    // call function using Promise interface
+    api_obj.get_taxon().then(
+        function(taxon) {
+            do_something_with(taxon);
+    });
 
 Genome annotation interface
 ---------------------------
@@ -35,36 +46,44 @@ Genome annotation interface
 
 .. js:function:: get_taxon()
 
+    Retrieve the Taxon associated with this GenomeAnnotation.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: ObjectReference
+    :returns:  :js:class:`ObjectReference` 
 
 .. js:function:: get_assembly()
 
+    Retrieve the Assembly associated with this GenomeAnnotation.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: ObjectReference
+    :returns:  :js:class:`ObjectReference` 
 
 .. js:function:: get_feature_types()
 
+    Retrieve the list of Feature types in this GenomeAnnotation.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: list<string>
+    :returns: ``list<string>``
 
 .. js:function:: get_feature_type_descriptions(feature_type_list)
 
+    Retrieve the descriptions for each Feature type in this GenomeAnnotation.
+
     :param list<string> feature_type_list:
     :throws ServiceException:
     :throws AuthorizationException:
@@ -72,10 +91,12 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,string>
+    :returns: ``map<string,string>``
 
 .. js:function:: get_feature_type_counts(feature_type_list)
 
+    Retrieve the count of each Feature type in this GenomeAnnotation.
+
     :param list<string> feature_type_list:
     :throws ServiceException:
     :throws AuthorizationException:
@@ -83,9 +104,11 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,i64>
+    :returns: ``map<string,i64>``
 
 .. js:function:: get_feature_ids(filters, group_type)
+
+    Retrieve Feature ids in this GenomeAnnotation, optionally filtered by type, region, function, alias.
 
     :param Feature_id_filters filters:
     :param string group_type:
@@ -95,10 +118,12 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: Feature_id_mapping
+    :returns:  :js:class:`Feature_id_mapping` 
 
 .. js:function:: get_features(feature_id_list)
 
+    Retrieve Feature data available in this GenomeAnnotation.
+
     :param list<string> feature_id_list:
     :throws ServiceException:
     :throws AuthorizationException:
@@ -106,20 +131,24 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,Feature_data>
+    :returns: ``map<string,`` :js:class:`Feature_data` ``>``
 
 .. js:function:: get_proteins()
 
+    Retrieve Protein data available in this GenomeAnnotation.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,Protein_data>
+    :returns: ``map<string,`` :js:class:`Protein_data` ``>``
 
 .. js:function:: get_feature_locations(feature_id_list)
 
+    Retrieve Feature locations in this GenomeAnnotation.
+
     :param list<string> feature_id_list:
     :throws ServiceException:
     :throws AuthorizationException:
@@ -127,10 +156,12 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,list<Region>>
+    :returns: ``map<string,list<`` :js:class:`Region` ``>>``
 
 .. js:function:: get_feature_publications(feature_id_list)
 
+    Retrieve Feature publications in this GenomeAnnotation.
+
     :param list<string> feature_id_list:
     :throws ServiceException:
     :throws AuthorizationException:
@@ -138,10 +169,12 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,list<string>>
+    :returns: ``map<string,list<string>>``
 
 .. js:function:: get_feature_dna(feature_id_list)
 
+    Retrieve Feature DNA sequences in this GenomeAnnotation.
+
     :param list<string> feature_id_list:
     :throws ServiceException:
     :throws AuthorizationException:
@@ -149,10 +182,12 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,string>
+    :returns: ``map<string,string>``
 
 .. js:function:: get_feature_functions(feature_id_list)
 
+    Retrieve Feature functions in this GenomeAnnotation.
+
     :param list<string> feature_id_list:
     :throws ServiceException:
     :throws AuthorizationException:
@@ -160,10 +195,12 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,string>
+    :returns: ``map<string,string>``
 
 .. js:function:: get_feature_aliases(feature_id_list)
 
+    Retrieve Feature aliases in this GenomeAnnotation.
+
     :param list<string> feature_id_list:
     :throws ServiceException:
     :throws AuthorizationException:
@@ -171,9 +208,11 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,list<string>>
+    :returns: ``map<string,list<string>>``
 
 .. js:function:: get_cds_by_gene(gene_id_list)
+
+    Retrieve the CDS id for each Gene id in this GenomeAnnotation.
 
     :param list<string> gene_id_list:
     :throws ServiceException:
@@ -182,9 +221,11 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,list<string>>
+    :returns: ``map<string,list<string>>``
 
 .. js:function:: get_cds_by_mrna(mrna_id_list)
+
+    Retrieve the CDS id for each mRNA id in this GenomeAnnotation.
 
     :param list<string> mrna_id_list:
     :throws ServiceException:
@@ -193,9 +234,11 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,string>
+    :returns: ``map<string,string>``
 
 .. js:function:: get_gene_by_cds(cds_id_list)
+
+    Retrieve the Gene id for each CDS id in this GenomeAnnotation.
 
     :param list<string> cds_id_list:
     :throws ServiceException:
@@ -204,9 +247,11 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,string>
+    :returns: ``map<string,string>``
 
 .. js:function:: get_gene_by_mrna(mrna_id_list)
+
+    Retrieve the Gene id for each mRNA id in this GenomeAnnotation.
 
     :param list<string> mrna_id_list:
     :throws ServiceException:
@@ -215,10 +260,12 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,string>
+    :returns: ``map<string,string>``
 
 .. js:function:: get_mrna_by_cds(gene_id_list)
 
+    Retrieve the mRNA id for each CDS id in this GenomeAnnotation.
+
     :param list<string> gene_id_list:
     :throws ServiceException:
     :throws AuthorizationException:
@@ -226,10 +273,12 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,string>
+    :returns: ``map<string,string>``
 
 .. js:function:: get_mrna_by_gene(gene_id_list)
 
+    Retrieve the mRNA id for each Gene id in this GenomeAnnotation.
+
     :param list<string> gene_id_list:
     :throws ServiceException:
     :throws AuthorizationException:
@@ -237,7 +286,14 @@ Genome annotation interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,list<string>>
+    :returns: ``map<string,list<string>>``
+
+----
+
+.. js:data:: ObjectReference
+
+
+    ``string``
 
 ----
 

@@ -8,7 +8,7 @@ The Taxon API can be used as a client of the Python server.
 
 .. contents::
 
-Creating a Taxon object
+Creating and using a Taxon object
 ----------------------
 To create a new object, instantiate :js:class:`Taxon`
 using a configuration object as the input argument.
@@ -21,7 +21,18 @@ using a configuration object as the input argument.
         url: 'http://narrative.kbases.us',
         token: '',
         timeout: 6000
-    })
+    });
+
+To use the object, call the Promise-wrapped functions
+and process the results accordingly.
+
+.. code-block:: javascript
+
+    // call function using Promise interface
+    api_obj.get_info().then(
+        function(info) {
+            do_something_with(info);
+    });
 
 Taxon interface
 ---------------
@@ -35,163 +46,216 @@ Taxon interface
 
 .. js:function:: get_info()
 
+    Retrieve object info.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: ObjectInfo
+    :returns:  :js:class:`ObjectInfo` 
 
 .. js:function:: get_history()
 
+    Retrieve object history.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: ObjectHistory
+    :returns:  :js:class:`ObjectHistory` 
 
 .. js:function:: get_provenance()
 
+    Retrieve object provenance.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: ObjectProvenance
+    :returns:  :js:class:`ObjectProvenance` 
 
 .. js:function:: get_id()
 
+    Retrieve object identifier.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: i64
+    :returns: ``i64``
 
 .. js:function:: get_name()
 
+    Retrieve object name.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: string
+    :returns: ``string``
 
 .. js:function:: get_version()
 
+    Retrieve object version.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: string
+    :returns: ``string``
 
 .. js:function:: get_parent()
 
+    Retrieve parent Taxon.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: ObjectReference
+    :returns:  :js:class:`ObjectReference` 
 
 .. js:function:: get_children()
 
+    Retrieve children Taxon.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: list<ObjectReference>
+    :returns: ``list<`` :js:class:`ObjectReference` ``>``
 
 .. js:function:: get_genome_annotations()
 
+    Retrieve associated GenomeAnnotation objects.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: list<ObjectReference>
+    :returns: ``list<`` :js:class:`ObjectReference` ``>``
 
 .. js:function:: get_scientific_lineage()
 
+    Retrieve the scientific lineage.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: list<string>
+    :returns: ``list<string>``
 
 .. js:function:: get_scientific_name()
 
+    Retrieve the scientific name.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: string
+    :returns: ``string``
 
 .. js:function:: get_taxonomic_id()
 
+    Retrieve the taxonomic id.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: i32
+    :returns: ``i32``
 
 .. js:function:: get_kingdom()
 
+    Retrieve the kingdom.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: string
+    :returns: ``string``
 
 .. js:function:: get_domain()
 
+    Retrieve the domain.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: string
+    :returns: ``string``
 
 .. js:function:: get_genetic_code()
 
+    Retrieve the genetic code.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: i32
+    :returns: ``i32``
 
 .. js:function:: get_aliases()
 
+    Retrieve the aliases.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: list<string>
+    :returns: ``list<string>``
+
+----
+
+.. js:data:: ObjectReference
+
+
+    ``string``
+
+----
+
+.. js:data:: ObjectHistory
+
+
+    ``list<`` :js:class:`ObjectInfo` ``>``
+
+----
+
+.. js:data:: ObjectProvenance
+
+
+    ``list<`` :js:class:`ObjectProvenanceAction` ``>``
 
 ----
 
