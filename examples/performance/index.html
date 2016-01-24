@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Hello, World</title>
+        <title>Performance Test</title>
         <!-- data-main attribute tells require.js to load
              scripts/main.js after require.js loads. -->
         <script data-main="main" src="../bower_components/requirejs/require.js"></script>
@@ -44,22 +44,13 @@
         </style>
     </head>
     <body>
-        <h1>Hello, World</h1>
-        <p>from the Data API</p>
+        <h1>Data API Performance</h1>
 
-        <h2>Taxon <span id='taxon_ref' class='idref'></span></h2>
-        <h3>Lineage</h3>
-        <div id='taxon_lineage'></div>
-            
-        <h2>Assembly <span id='assembly_ref' class='idref'></span></h2>
-        <h3>Stats</h3>
-        <div id='assembly_stats'></div>
+        <h2>Genome Annotation</h2>
+        <div id="progress">
+        </div>
+        <div id="results">
 
-        <h2>Genome Annotation <span id='genome_ref' class='idref'></span></h2>
-        <h3>Features</h3>
-        <div id='genome_features'></div>
-        <h3>Selected Feature Details</h3>
-        <div id='genome_feature_details'></div>
-
+        </div>
     </body>
 </html>
