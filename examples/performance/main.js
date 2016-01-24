@@ -33,6 +33,8 @@ requirejs.config({
         kb_common_cookie: 'bower_components/kbase-common-js/cookie',
         kb_common_logger: 'bower_components/kbase-common-js/logger',
         kb_common_session: 'bower_components/kbase-common-js/session'
+        // App
+        //kb_app: 'performance/app'
     },
 
     shim: {
@@ -48,5 +50,5 @@ requirejs.config({
     },
 
     // ask Require.js to load these files
-    deps: ['app.js'],
+    deps: ['app.js']
 });

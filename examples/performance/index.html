@@ -5,52 +5,13 @@
         <!-- data-main attribute tells require.js to load
              scripts/main.js after require.js loads. -->
         <script data-main="main" src="../bower_components/requirejs/require.js"></script>
-        <style type="text/css">
-            body {
-                font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-                font-size: 14px;
-                margin: 1em;
-            }
-            h2 {
-                width: 100%;
-                border-bottom: 2px solid #DEDEDE;
-                background-color: #E7E7E7;
-            }
-            .idref {
-                font-family: monospace;
-            }
-            table.gridtable {
-            	font-family: verdana,arial,sans-serif;
-            	font-size:11px;
-            	color:#333333;
-            	border-width: 1px;
-            	border-color: #666666;
-            	border-collapse: collapse;
-            }
-            table.gridtable th {
-            	border-width: 1px;
-            	padding: 8px;
-            	border-style: solid;
-            	border-color: #666666;
-            	/*background-color: #dedede;*/
-            }
-            table.gridtable td {
-            	border-width: 1px;
-            	padding: 8px;
-            	border-style: solid;
-            	border-color: #666666;
-            	background-color: #ffffff;
-            }
-        </style>
+        <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
         <h1>Data API Performance</h1>
-
+        <button id="start-app" onclick="startApplication()">Start</button>
         <h2>Genome Annotation</h2>
-        <div id="progress">
-        </div>
         <div id="results">
-
         </div>
     </body>
 </html>

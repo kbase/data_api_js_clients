@@ -18,8 +18,7 @@ define(['jquery', 'underscore', 'bluebird',
             annotation: ':9103'
         };
 
-        //XXX: Hardcoded token
-        var auth_token='un=dangunter|tokenid=f3fa9942-9a13-11e5-ad16-22000aef184d|expiry=1480720619|client_id=dangunter|token_type=Bearer|SigningSubject=https://nexus.api.globusonline.org/goauth/keys/ae1e4708-9530-11e5-b10e-22000ab4b42b|sig=b259d86ca0262b5bb25529c946236e45a10c4f6b8db4c49a3dd3443b8ed3458e0e58606437a08cb005e51fbcc2d8fd34e9d2f8981a067ec523abb510e1de4c5157b0bc0bb35fb69fcb5f8b47a1fd77ab7a62162dc99bdaa1a78d7db063b818dfacf76d11e0bec28aa6f35a4f064cdf1a608cd1a64bdb4c9efe962cccc3f5ad68';
+        var auth_token = '';
 
         /**
          * List of genomes to measure performance on.
@@ -66,36 +65,47 @@ define(['jquery', 'underscore', 'bluebird',
          * @param name What is being reported
          * @constructor
          */
-        var Reporter = function(name) {
-            this.name = name;
+        var Reporter = function(element) {
+            this.elt = $(element);
+            this.perf_result_id = 'perf-result';
             this.executions = [];
+            this.elt.append($('<table>').attr('id', this.perf_result_id)
+                .append($('<tr>')
+                    .append($('<th>').text('Reference'))
+                    .append($('<th>').text('Method'))
+                    .append($('<th>').text('Time (s)'))));
         };
         Reporter.prototype.add = function(method, params, dur) {
             var value = {method: method, parameters: params, duration: dur};
             this.executions.push(value);
             console.debug(value);
+            $('#' + this.perf_result_id).append($('<tr>')
+                .append($('<td>').text(params.ref))
+                .append($('<td>').text(method))
+                .append($('<td>').text('' + (dur / 1000.0))));
         };
 
         /**
          * Entry point.
          */
-        function main() {
+        function main(auth_token) {
             console.log("Gentlemen, start your engines!");
 
             var url = base_url + api_url_suffix.annotation;
-            var rpt = new Reporter('Genome Annotation');
+            var rpt = new Reporter('#results');
             // Loop over methods and genomes.
             // Recursion is used to serialize the genomes and methods,
             // without locking up the browser.
             var run_next_genome = function(genomes) {
-                if (genomes.length == 0) { return true; }
+                if (genomes.length == 0) { return; }
                 var g = genomes.pop();
                 console.debug('Genome:', g);
                 var obj = GenomeAnnotation({ref: g.ref, url: url, token: auth_token, timeout: 1000000});
                 var run_next_method = function(genomes, methods) {
                     // if done with methods, run next genome
                     if (methods.length == 0) {
-                        return run_next_genome(genomes);
+                        run_next_genome(genomes);
+                        return;
                     }
                     // start the timer
                     var t = new Timer();
@@ -110,12 +120,12 @@ define(['jquery', 'underscore', 'bluebird',
                         return run_next_method(genomes, methods);
                     });
                 };
-                return run_next_method(genomes, ['get_feature_ids']);
+                run_next_method(genomes, ['get_feature_ids']);
             };
             run_next_genome(big_genomes);
         }
 
-        main();
+        window.startApplication =  function() { main(''); }
     }
 );
 

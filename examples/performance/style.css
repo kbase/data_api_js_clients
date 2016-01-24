@@ -1,0 +1,24 @@
+body {
+  font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: 1em; }
+
+h2 {
+  width: 100%;
+  border-bottom: 2px solid #DEDEDE;
+  background-color: #E7E7E7; }
+
+.idref {
+  font-family: monospace; }
+
+table.gridtable {
+  font: verdana, arial, sans-serif 11px;
+  color: #333333;
+  border: 1px solid #666666;
+  border-collapse: collapse; }
+  table.gridtable th {
+    padding: 8px; }
+  table.gridtable td {
+    padding: 8px;
+    background-color: #ffffff; }
+
+/*# sourceMappingURL=style.css.map */
