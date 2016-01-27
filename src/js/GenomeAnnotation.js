@@ -73,7 +73,8 @@ define([
             'feature_type_descriptions', 'feature_type_counts',
             'features', 'feature_locations', 'feature_publications', 'feature_dna',
             'feature_functions', 'feature_aliases', 'cds_by_gene', 'cds_by_mrna',
-            'gene_by_cds', 'gene_by_mrna', 'mrna_by_cds', 'mrna_by_gene'];
+            'gene_by_cds', 'gene_by_mrna', 'mrna_by_cds', 'mrna_by_gene',
+            'mrna_exons', 'mrna_utrs'];
 
         flist.forEach(function(name) {
             // Set exported function to a function curried for 'name'
