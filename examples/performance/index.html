@@ -1,17 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <title>Performance Test</title>
         <!-- data-main attribute tells require.js to load
              scripts/main.js after require.js loads. -->
         <script data-main="main" src="../bower_components/requirejs/require.js"></script>
+        <link rel="stylesheet" type="text/css" href="../bower_components/bootstrap/css/bootstrap.css">
         <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
+    <div class="container">
         <h1>Data API Performance</h1>
-        <button id="start-app" onclick="startApplication()">Start</button>
-        <h2>Genome Annotation</h2>
-        <div id="results">
+        <!-- Configure and run -->
+            <div class="row">
+                <span class="col-md-3 h4"><small>Object size</small></span>
+                <span class="col-md-3 h4"><small>Data API service location</small></span>
+                <span class="col-md-1 col-md-offset-1"></span>
+            </div>
+            <div class="row">
+                <!-- Choose object size -->
+                <div class="btn-group col-md-3" role="group" id="object-size"></div>
+                <!-- Choose service destination -->
+                <div class="btn-group col-md-3" role="group" id="service-location"></div>
+                <!-- Start a run -->
+                <button class="btn btn-success col-md-1 col-md-offset-1" id="start-app" onclick="startApplication()">Start</button>
+            </div>
+        <!-- Results go here -->
+            <h2>Genome Annotation</h2>
+            <div id="results">
         </div>
+    </div>
     </body>
 </html>

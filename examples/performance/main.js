@@ -40,6 +40,10 @@ requirejs.config({
     shim: {
         'underscore': {
             exports: '_'
+        },
+        bootstrap : {
+            dep : [ 'jquery'],
+            exports: 'Bootstrap'
         }
     },
     map: {
