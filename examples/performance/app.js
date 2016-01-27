@@ -33,30 +33,39 @@ define(['jquery', 'underscore', 'bluebird', 'bootstrap',
         };
 
         /**
-         * List of genomes to measure performance on.
+         * List of genomes on which to measure performance/
+         *
+         * Note that these will be run in reverse order.
          *
          * @type {*[]}
          */
         var genomes = {
-            big: [{
-                name: 'Hordeum vulgare',
-                id: 'kb|g.140105',
-                ref: '4258/919/1',
-                bases: 4706057868
-            },
+            big: [
                 {
-                    name: 'Malus domestica',
-                    id: 'kb|g.166816',
-                    ref: '4258/1537/1',
-                    bases: 881278625
+                  name: 'New: Desulfovibrio alaskensis DSM 1610901',
+                    id: 'kb|g.207109',
+                    ref: '1837/215/3',
+                    bases: 3550684
                 }
+                //{
+                //    name: 'Hordeum vulgare',
+                //    id: 'kb|g.140105',
+                //    ref: '4258/919/1',
+                //    bases: 4706057868
+                //}
+                //{
+                //    name: 'Malus domestica',
+                //    id: 'kb|g.166816',
+                //    ref: '4258/1537/1',
+                //    bases: 881278625
+                //}
             ],
             small: [{
-                name: 'Acetobacter aceti',
-                id: 'kb|g.26675',
-                ref: '4258/21328/1',
-                bases: 5123
-            }
+                    name: 'Old: Acetobacter aceti',
+                    id: 'kb|g.26675',
+                    ref: '4258/21328/1',
+                    bases: 5123
+                }
             ]
         };
 
@@ -169,7 +178,13 @@ define(['jquery', 'underscore', 'bluebird', 'bootstrap',
         Reporter.prototype.param_string = function(params) {
             var p = '';
             if (params !== undefined) {
-                p = params.join(',');
+                try {
+                    p = params.join(',');
+                }
+                catch (e) {
+                    p = '' + params;
+                    //log.warn("Couldn't join parameters:", params);
+                }
                 if (p.length > 80) {
                     p = p.slice(0, 77) + '...';
                 }
@@ -210,6 +225,7 @@ define(['jquery', 'underscore', 'bluebird', 'bootstrap',
          * @param cb Callback when no more methods
          */
         function run_next_method(obj, methods, g, cb) {
+            // For debugging:cb(); return;
             // If done with methods, run next genome
             if (methods.length == 0) {
                 cb();
@@ -222,42 +238,62 @@ define(['jquery', 'underscore', 'bluebird', 'bootstrap',
             var m = meth_args[0], args = meth_args[1];
             t.start(m + ' ' + g.ref);
             // Call the method
-            reporter.working(m);
+            reporter.working(m, args);
             var params = args; // un-transformed args
+            var skip = false;
             // For get_features(), replace a numeric argument with
             // that number of feature IDs (retrieved previously).
             if (m == 'get_features' && typeof(args) == 'number') {
                 // interpret negative values as 'last N'
                 args = (args > 0) ?
-                    _.first(all_feature_ids[g.ref], args):
-                    _.last(all_feature_ids[g.ref], -args);
+                    [_.first(all_feature_ids[g.ref], args)]:
+                    [_.last(all_feature_ids[g.ref], -args)];
                 params = [args];
             }
             else if (m == 'get_mrna_by_cds') {
-                params = args = all_feature_ids[g.ref];
+                params = args = [all_feature_ids[g.ref]];
+                if (params[0].length == 0) {
+                    console.info('get_mrna_by_cds: No IDs to fetch');
+                    all_mrna_ids[g.ref] = [];
+                    skip = true;
+                }
             }
             else if (m == 'get_mrna_utrs' && typeof(args) == 'number') {
-                params = args = _.first(all_mrna_ids[g.ref], args);
+                params = args = [_.first(all_mrna_ids[g.ref], args)];
+                if (params.length[0] == 0) {
+                    console.info('get_mrna_utrs: No mRNA ids to fetch');
+                    skip = true;
+                }
             }
-            log.debug('Calling ' + m + ' with ' +  args.length + ' arguments');
-            obj[m].apply(null, args).then(function (value) {
-                // If result is all feature IDs, extract 'id' for later.
-                if (m == 'get_feature_ids' && args.length == 0) {
-                    all_feature_ids[g.ref] = value['by_type']['CDS'];
-                    log.debug('Storing ' + all_feature_ids[g.ref].length +
-                              ' features in all_feature_ids[' + g.ref + ']');
-                }
-                else if (m == 'get_mrna_by_cds') {
-                    all_mrna_ids[g.ref] = _.values(value);
-                    console.debug('save ' + all_mrna_ids[g.ref].length + ' mRNA ids for genome ' + g.ref);
-                }
+            if (skip) {
                 // Stop the timer
                 var elapsed = t.stop();
                 // Report the timing
-                reporter.done(m, params, elapsed);
+                reporter.done(m, ['SKIPPED'], elapsed);
                 run_next_method(obj, methods, g, cb);
                 return null;
-            });
+            }
+            else {
+                log.debug('Calling ' + m + ' with ' + args.length + ' arguments');
+                obj[m].apply(null, args).then(function (value) {
+                    // If result is all feature IDs, extract 'id' for later.
+                    if (m == 'get_feature_ids' && args.length == 0) {
+                        all_feature_ids[g.ref] = value['by_type']['CDS'];
+                        log.debug('Storing ' + all_feature_ids[g.ref].length +
+                            ' features in all_feature_ids[' + g.ref + ']');
+                    }
+                    else if (m == 'get_mrna_by_cds') {
+                        all_mrna_ids[g.ref] = _.values(value);
+                        console.debug('save ' + all_mrna_ids[g.ref].length + ' mRNA ids for genome ' + g.ref);
+                    }
+                    // Stop the timer
+                    var elapsed = t.stop();
+                    // Report the timing
+                    reporter.done(m, params, elapsed);
+                    run_next_method(obj, methods, g, cb);
+                    return null;
+                });
+            }
         }
 
         /**
@@ -265,15 +301,15 @@ define(['jquery', 'underscore', 'bluebird', 'bootstrap',
          * Tail-recursion is used to serialize loops through genomes
          * and methods, without locking up the browser.
          */
-        function run_next_genome(genomes, options) {
-            if (genomes.length == 0) { return null; }
-            var g = genomes.pop();
+        function run_next_genome(gnm, options) {
+            if (gnm.length == 0) { return null; }
+            var g = gnm.pop();
             log.debug('Genome:', g);
             reporter.start_genome(g);
             options['ref'] = g.ref;
             var obj = GenomeAnnotation(options);
             run_next_method(obj, selected_methods, g, function() {
-                return run_next_genome(genomes);
+                return run_next_genome(gnm, options);
             });
         }
 
