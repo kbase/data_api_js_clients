@@ -189,7 +189,7 @@ module.exports = function (grunt) {
             src: 'css.js'
         },
         {
-            dir: 'thrift-binary-protocol',
+            dir: 'kbase-binary-thrift-js',
             cwd: 'src',
             src: ['**/*']
         }
@@ -368,7 +368,7 @@ module.exports = function (grunt) {
             thriftBinaryLib: {
                 files: [
                     {
-                        cwd: 'bower_components/thrift-binary-protocol/src',
+                        cwd: 'bower_components/kbase-data-thrift-js/src',
                         src: 'thrift-js-binary-protocol.js',
                         dest: makeBuildPath('js/thrift'),
                         expand: true
