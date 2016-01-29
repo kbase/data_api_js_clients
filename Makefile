@@ -16,11 +16,14 @@ targets: FORCE
 	@printf "Primary target:\n"
 	@printf "  test          Build and run tests\n"
 	@printf "Sub-targets:\n"
-	@printf "  build         Run the 'grunt build' command after setting PATH\n"
-	@printf "  rebuild       Run 'grunt build' just for the Thrift libs\n"
-	@printf "  retest        Update Thrift libs and run tests, without a full build\n"
-	@printf "  runtest       Run tests without rebuilding anything. This is much faster.\n"
-	@printf "  shutdown      Kill all running services\n"
+	@printf "  build              Run the 'grunt build' command after setting PATH\n"
+	@printf "  rebuild            Run 'grunt build' just for the Thrift libs\n"
+	@printf "  retest             Update Thrift libs and run tests, without a full build\n"
+	@printf "  runtest            Run tests without rebuilding anything. This is much faster.\n"
+	@printf "  init               Start Data API and CORS proxy services\n"
+	@printf "  init-perf-cache    Start Data API and CORS proxy services, performance-test mode, with Redis\n"
+	@printf "  init-perf-nocache  Start Data API and CORS proxy services, performance-test mode, no Redis\n"
+	@printf "  shutdown           Kill all running services\n"
 
 clone:
 	test -d core-develop || git clone -b develop https://github.com/kbase/data_api.git core-develop
@@ -60,10 +63,33 @@ init: FORCE
 		( data_api_start_service.py --config data_api-test.cfg --kbase_url localhost --service $$s > $$s.out 2>&1 & ) ;\
 	done
 
+# Performance tests
+init-perf-cache: FORCE
+	@printf "+- Init: Start Redis\n"
+	redis-server redis.conf &	
+	@printf "+- Init: Run proxy\n"
+	CORSPROXY_PORT=8000 ./node_modules/corsproxy/bin/corsproxy > corsproxy.out 2>&1 &
+	@printf "+- Init: Start services\n"
+	for s in taxon assembly genome_annotation ; do \
+		printf "  +-- Start $$s service\n"; \
+		( data_api_start_service.py --config perftest.cfg --kbase_url dir_cache --service $$s > $$s.out 2>&1 & ) ;\
+	done
+
+init-perf-nocache: FORCE
+	@printf "+- Init: Run proxy\n"
+	CORSPROXY_PORT=8000 ./node_modules/corsproxy/bin/corsproxy > corsproxy.out 2>&1 &
+	@printf "+- Init: Start services\n"
+	for s in taxon assembly genome_annotation ; do \
+		printf "  +-- Start $$s service\n"; \
+		( data_api_start_service.py --config perftest.cfg --kbase_url dir_nocache --service $$s > $$s.out 2>&1 & ) ;\
+	done
+	
+
 shutdown: FORCE
 	@printf "+- Shutdown\n"
 	ps auxw | grep "[d]ata_api_start_service" | cut -c17-23 | xargs kill
 	ps auxw | grep "[c]orsproxy" | cut -c17-23 | xargs kill
+	ps auxw | grep "[r]edis-server" | cut -c17-23 | xargs kill
 	@ sleep 2
 
 cleandown: shutdown clean

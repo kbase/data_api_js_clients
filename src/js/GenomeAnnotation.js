@@ -65,7 +65,7 @@ define([
                 return Promise.resolve(client()[fname](authToken,
                     objectReference, true)) ;
             } 
-        })
+        });
 
         // Methods taking a list of string identifiers as its only argument
 
@@ -73,7 +73,8 @@ define([
             'feature_type_descriptions', 'feature_type_counts',
             'features', 'feature_locations', 'feature_publications', 'feature_dna',
             'feature_functions', 'feature_aliases', 'cds_by_gene', 'cds_by_mrna',
-            'gene_by_cds', 'gene_by_mrna', 'mrna_by_cds', 'mrna_by_gene'];
+            'gene_by_cds', 'gene_by_mrna', 'mrna_by_cds', 'mrna_by_gene',
+            'mrna_exons', 'mrna_utrs'];
 
         flist.forEach(function(name) {
             // Set exported function to a function curried for 'name'
@@ -81,7 +82,15 @@ define([
             // with one argument (a list of identifiers), and returns a Promise.
             var fname = 'get_' + name;
             exports[fname] = function(items) {
-                if (items.length === 0) {                        
+                if (items === undefined || items === null) {
+                    throw {
+                        type: 'ArgumentError',
+                        name: 'Empty' + (name.search('_type_') > 0 ? 'Type': 'Identifier') + 'List',
+                        message: 'Input list for ' + fname + ' cannot be undefined or null',
+                        suggestion: 'You must have at least one item in the list.'
+                    }
+                }
+                if (items.length === 0) {
                     throw {
                         type: 'ArgumentError',
                         name: 'Empty' + (name.search('_type_') > 0 ? 'Type': 'Identifier') + 'List',
@@ -92,15 +101,15 @@ define([
                 return Promise.resolve(client()[fname](authToken,
                     objectReference, items, true));
             }
-        })
+        });
 
-        // 'feature_ids' takes 2 extra arguments, a list of fileters and a group type
+        // 'feature_ids' takes 2 extra arguments, a list of filters and a group type
 
         var fname = 'get_feature_ids';
         exports[fname] = function(filters, group_type) {
             return Promise.resolve(client()[fname](authToken,
                 objectReference, filters, group_type, true))            
-        }
+        };
 
         // Return public methods
 

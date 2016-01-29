@@ -1,0 +1,25 @@
+$base-font: "Helvetica Neue",Helvetica,Arial,sans-serif;
+$data-font: verdana,arial,sans-serif;
+
+body {
+  font: 14px $base-font;
+  margin: 1em;
+}
+h2 {
+}
+.idref {
+  font-family: monospace;
+}
+table.gridtable {
+  font: $data-font 11px;
+  color:#333333;
+  border: 1px solid #666666;
+  border-collapse: collapse;
+  th {
+    padding: 8px;
+  }
+  td {
+    padding: 8px;
+    background-color: #ffffff;
+  }
+}

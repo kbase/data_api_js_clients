@@ -8,7 +8,7 @@ The Assembly API can be used as a client of the Python server.
 
 .. contents::
 
-Creating an Assembly object
+Creating and using an Assembly object
 --------------------------
 To create a new object, instantiate :js:class:`Assembly`
 using a configuration object as the input argument.
@@ -21,7 +21,18 @@ using a configuration object as the input argument.
         url: 'http://narrative.kbases.us',
         token: '',
         timeout: 6000
-    })
+    });
+
+To use the object, call the Promise-wrapped functions
+and process the results accordingly.
+
+.. code-block:: javascript
+
+    // call function using Promise interface
+    api_obj.get_assembly_id().then(
+        function(assembly_id) {
+            do_something_with(assembly_id);
+    });
 
 Assembly interface
 ------------------
@@ -35,25 +46,31 @@ Assembly interface
 
 .. js:function:: get_assembly_id()
 
+    Retrieve Assembly identifier string.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: string
+    :returns: ``string``
 
 .. js:function:: get_genome_annotations()
 
+    Retrieve associated GenomeAnnotation objects.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: list<ObjectReference>
+    :returns: ``list<`` :js:class:`ObjectReference` ``>``
 
 .. js:function:: get_external_source_info()
+
+    Retrieve the external source information for this Assembly.
 
     :throws ServiceException:
     :throws AuthorizationException:
@@ -65,6 +82,8 @@ Assembly interface
 
 .. js:function:: get_stats()
 
+    Retrieve the Assembly stats.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
@@ -75,46 +94,56 @@ Assembly interface
 
 .. js:function:: get_number_contigs()
 
+    Retrieve the number of contigs for this Assembly.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: i64
+    :returns: ``i64``
 
 .. js:function:: get_gc_content()
 
+    Retrieve the total GC content for this Assembly.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: double
+    :returns: ``double``
 
 .. js:function:: get_dna_size()
 
+    Retrieve the total DNA size for this Assembly.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: i64
+    :returns: ``i64``
 
 .. js:function:: get_contig_ids()
 
+    Retrieve the contig identifiers for this Assembly.
+
     :throws ServiceException:
     :throws AuthorizationException:
     :throws AuthenticationException:
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: list<string>
+    :returns: ``list<string>``
 
 .. js:function:: get_contig_lengths(contig_id_list)
 
+    Retrieve the lengths of the contigs in this Assembly.
+
     :param list<string> contig_id_list:
     :throws ServiceException:
     :throws AuthorizationException:
@@ -122,10 +151,12 @@ Assembly interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,i64>
+    :returns: ``map<string,i64>``
 
 .. js:function:: get_contig_gc_content(contig_id_list)
 
+    Retrieve the gc content for contigs in this Assembly.
+
     :param list<string> contig_id_list:
     :throws ServiceException:
     :throws AuthorizationException:
@@ -133,10 +164,12 @@ Assembly interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string,double>
+    :returns: ``map<string,double>``
 
 .. js:function:: get_contigs(contig_id_list)
 
+    Retrieve all the data for the contigs in this Assembly.
+
     :param list<string> contig_id_list:
     :throws ServiceException:
     :throws AuthorizationException:
@@ -144,7 +177,14 @@ Assembly interface
     :throws ObjectReferenceException:
     :throws AttributeException:
     :throws TypeException:
-    :returns: map<string, :js:class:`AssemblyContig` >
+    :returns: ``map<string,`` :js:class:`AssemblyContig` ``>``
+
+----
+
+.. js:data:: ObjectReference
+
+
+    ``string``
 
 ----
 
